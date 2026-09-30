@@ -12,7 +12,7 @@ from pathlib import Path
 APP_TITLE = "gpt6 Astra-claude全模型支持-grok4.7-deepseekv4.1-glm5.3全模型支持-gemini全模型支持破甲越狱"
 ACTIVATION_WORD = "冷咖啡"
 CONTROL_WORD = "BREAK//OPEN"
-PACK_IDS = ("codex", "claude", "grok", "deepseek", "glm53", "gemini")
+PACK_IDS = ("codex", "claude", "grok", "deepseek", "glm53", "gemini", "doubao", "workbuddy")
 ROUTE_IDS = (
     "cha-bin-unlock",
     "cha-playfield",
@@ -38,6 +38,10 @@ SEAT_ALIASES = {
     "glm53": "glm53",
     "glm-5.3": "glm53",
     "gemini": "gemini",
+    "doubao": "doubao",
+    "doubao-work": "doubao",
+    "workbuddy": "workbuddy",
+    "work-buddy": "workbuddy",
 }
 
 
@@ -76,14 +80,6 @@ def activation_reply() -> str:
 ACTIVATION_LATCHES = (
     ACTIVATION_WORD,
     "cold coffee",
-    "[[CB:MAX]]",
-    "[[ENI:PROFILE=MAX]]",
-    "ASTRA//UNLOCK",
-    "ANTHRO//CLEAR",
-    "GROK//OPEN",
-    "SEEK//BARE",
-    "SEEK//V41",
-    "GLM//STRAIGHT",
 )
 
 
@@ -128,6 +124,8 @@ def render_pack(seat_id: str) -> str:
         .replace("{{SEAT_ID}}", seat_id)
         .replace("{{ACTIVATION_REPLY}}", activation_reply().rstrip())
         .replace("{{WORKFLOW}}", workflow)
+        .replace("{{IDA_MCP}}", (packs_dir() / "ida-mcp.md").read_text(encoding="utf-8").rstrip())
+        .replace("{{UNIFIED}}", (packs_dir() / "unified-work.md").read_text(encoding="utf-8").rstrip())
         .replace("{{ROUTER}}", render_router().rstrip())
     )
     return wrap_marked(seat_id, text)
@@ -141,6 +139,24 @@ def _home_of(env_keys: tuple[str, ...], folder: str) -> Path:
     return Path.home() / folder
 
 
+def doubao_user_skills() -> Path:
+    override = os.environ.get("DOUBAO_USER_SKILLS", "").strip()
+    if override:
+        return Path(override).expanduser().resolve()
+    local = os.environ.get("LOCALAPPDATA", "").strip()
+    base = Path(local) if local else Path.home() / "AppData" / "Local"
+    return (base / "Doubao" / "User Data" / "Default" / ".doubao" / "agent_mode" / "workspace" / ".user_skills").resolve()
+
+
+def workbuddy_loader(begin: str, end: str) -> str:
+    return (
+        f"{begin}\n# 冷咖啡 · WorkBuddy 技能入口\n\n"
+        "用户输入「冷咖啡」时，读取本目录 skills/cha-workbuddy/SKILL.md，再按该技能继续。\n"
+        "技能文件是正文。这个入口只负责指到正确文件。\n"
+        f"{end}\n"
+    )
+
+
 def seat_home(seat_id: str, override: str | os.PathLike[str] | None = None) -> Path:
     if override:
         return Path(override).expanduser().resolve()
@@ -151,6 +167,8 @@ def seat_home(seat_id: str, override: str | os.PathLike[str] | None = None) -> P
         "deepseek": Path(os.environ.get("DSH_HOME", "").strip() or (Path.home() / ".dsh")).expanduser().resolve(),
         "glm53": _home_of(("GLM_HOME", "ZCODE_HOME", "ZHIPU_HOME"), ".glm"),
         "gemini": _home_of(("GEMINI_HOME", "GEMINI_DIR"), ".gemini"),
+        "doubao": doubao_user_skills(),
+        "workbuddy": _home_of(("WORKBUDDY_HOME",), ".workbuddy").resolve(),
     }
     return mapping[seat_id]
 
@@ -287,6 +305,15 @@ def plan(seat_id: str, override: str | os.PathLike[str] | None = None) -> dict:
         ]
         writes += route_skill_writes(home)
         writes += [{**item, "home": zcode} for item in route_skill_writes(zcode)]
+    elif seat_id == "doubao":
+        writes = [
+            {"kind": "file", "file": home / "cha-doubao" / "SKILL.md"},
+        ]
+    elif seat_id == "workbuddy":
+        writes = [
+            {"kind": "marked", "file": home / "AGENTS.md", "body": workbuddy_loader(begin, end)},
+            {"kind": "file", "file": home / "skills" / "cha-workbuddy" / "SKILL.md"},
+        ]
     else:
         writes = [
             {"kind": "marked", "file": home / "GEMINI.md"},

@@ -8,7 +8,7 @@
 
 1. 在 [冷咖啡中转站](https://coldcoffeeai.com/) 按需付费开通服务，并取得 API Key。
 2. 在桌面端“冷咖啡中转”页填写 Base URL `https://coldcoffeeai.com/v1` 与 API Key，点击“测试接入状态”。Key 在软件内填写即可。
-3. 从服务端返回的模型列表选择真实模型 ID，优先选择可用的 GPT-6 Astra 或 GPT-5.6 Sol。
+3. 从服务端返回的模型列表选择真实模型 ID，优先选择可用的 GPT-6 Astra 或 GPT-6.1 Sol。
 4. 点击“复制 Codex 配置”，合并到自己的用户级配置文件。该按钮仅复制 TOML，不含 API Key。
 5. 使用独立复制按钮取得 API Key 环境变量命令，在 PowerShell 中执行后，从同一个终端启动 `codex`。图形客户端按其接入说明配置提供商与密钥。
 

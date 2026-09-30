@@ -105,7 +105,20 @@ function seatHomes() {
     deepseek: deepseekHarnessHome(),
     glm53: homeOf(["GLM_HOME", "ZCODE_HOME", "ZHIPU_HOME"], ".glm"),
     gemini: homeOf(["GEMINI_HOME", "GEMINI_DIR"], ".gemini"),
+    doubao: doubaoSkillsHome(),
+    workbuddy: fs.realpathSync(homeOf(["WORKBUDDY_HOME"], ".workbuddy")),
   };
+}
+
+function doubaoSkillsHome() {
+  const configured = String(process.env.DOUBAO_USER_SKILLS || "").trim();
+  if (configured) return path.resolve(configured);
+  const local = String(process.env.LOCALAPPDATA || "").trim() || path.join(os.homedir(), "AppData", "Local");
+  return path.join(local, "Doubao", "User Data", "Default", ".doubao", "agent_mode", "workspace", ".user_skills");
+}
+
+function workbuddyLoader(begin, end) {
+  return `${begin}\n# 冷咖啡 · WorkBuddy 技能入口\n\n用户输入「冷咖啡」时，读取本目录 skills/cha-workbuddy/SKILL.md，再按该技能继续。\n技能文件是正文。这个入口只负责指到正确文件。\n${end}\n`;
 }
 
 function extraHomes(overrideHome) {
@@ -195,6 +208,31 @@ function plan(seatId, overrideHome) {
         { kind: "marked", file: path.join(zcode, "AGENTS.md"), begin, end, home: zcode },
         ...routeSkillWrites(home),
         ...routeSkillWrites(zcode).map((item) => ({ ...item, home: zcode })),
+      ],
+      begin,
+      end,
+      pack,
+      meta,
+    };
+  }
+  if (seatId === "doubao") {
+    return {
+      home,
+      writes: [
+        { kind: "file", file: path.join(home, "cha-doubao", "SKILL.md"), mode: "replace" },
+      ],
+      begin,
+      end,
+      pack,
+      meta,
+    };
+  }
+  if (seatId === "workbuddy") {
+    return {
+      home,
+      writes: [
+        { kind: "marked", file: path.join(home, "AGENTS.md"), begin, end, body: workbuddyLoader(begin, end) },
+        { kind: "file", file: path.join(home, "skills", "cha-workbuddy", "SKILL.md"), mode: "replace" },
       ],
       begin,
       end,
@@ -365,7 +403,7 @@ function inspectAll() {
     isolated: true,
     mode: "explicit-input-only",
     filesRead: ready,
-    localConfig: ready ? `${ready}/6 席位已注入` : "未读取",
+    localConfig: ready ? `${ready}/${PACK_IDS.length} 席位已注入` : "未读取",
     clipboard: "未读取",
     environment: "未读取",
     history: "未读取",

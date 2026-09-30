@@ -6,9 +6,9 @@ ROOT=Path(__file__).resolve().parents[1]
 body='''<div align="center">
   <img src="docs/assets/coldcoffee-cover-v4.png" width="100%" alt="冷咖啡原创黑白漫画主视觉" />
   <h1>冷咖啡 · 破甲工作台</h1>
-  <p><strong>六模型席位 · 本地任务构建 · 付费中转入口 · 会话版本对比</strong></p>
+  <p><strong>八模型席位 · 本地任务构建 · 付费中转入口 · IDA 工具箱</strong></p>
   <p>保留冷咖啡的直接与锋利，让任务更明确，让输出有据可查。</p>
-  <p><a href="#软件界面">软件界面</a> · <a href="#冷咖啡中转">冷咖啡中转</a> · <a href="#闭源工作流">闭源工作流</a> · <a href="#上手使用">上手使用</a> · <a href="#冷咖啡社群">三个 QQ 群</a></p>
+  <p><a href="#软件界面">软件界面</a> · <a href="#冷咖啡中转">冷咖啡中转</a> · <a href="#闭源工作流">闭源工作流</a> · <a href="#上手使用">上手使用</a> · <a href="#工具箱">工具箱</a> · <a href="#冷咖啡社群">三个 QQ 群</a></p>
   <p><sub>3.1.0-preview.1 · 本地预览版 · 尚未验证真实模型突破效果</sub></p>
 </div>
 
@@ -19,7 +19,7 @@ body='''<div align="center">
 </blockquote>
 
 <h2 id="软件界面">软件功能界面</h2>
-<p>下面六张都是 3.1 工作台实机画面：左侧六个功能页，右侧对应操作区。不是概念图，也不是海报。</p>
+<p>下面六张仍是工作台实机画面，右侧是对应操作区。左侧现在有七个功能页，多出来的工具箱还没重拍截图。</p>
 <p><strong>01 任务模板</strong> · 写目标、选档位、本地构建任务契约；需要走付费中转时再点发送。</p>
 <img src="docs/assets/workbench-v3.png" width="100%" alt="冷咖啡工作台：任务模板，本地构建与交付预览" />
 <table>
@@ -58,10 +58,10 @@ body='''<div align="center">
 <table>
 <tr><th align="left">服务内容</th><th align="left">顾客看到的状态</th><th align="left">说明</th></tr>
 <tr><td><strong>内置工作流</strong></td><td>服务端自动应用</td><td>这是中转服务说明。当前未配置公开工作流目录接口；模型列表返回成功不代表已验证工作流激活。</td></tr>
-<tr><td><strong>GPT-6 Astra / GPT-5.6 Sol</strong></td><td>推荐模型，按实际列表选择</td><td>模型 ID 使用 <code>/models</code> 返回的真实值，可用范围以 API Key 权限为准。</td></tr>
+<tr><td><strong>GPT-6 Astra / GPT-6.1 Sol</strong></td><td>推荐模型，按实际列表选择</td><td>模型 ID 使用 <code>/models</code> 返回的真实值，可用范围以 API Key 权限为准。</td></tr>
 <tr><td><strong>完全访问</strong></td><td>在顾客自己的 Codex 中设置</td><td>这是本地工具权限，与中转套餐、余额和模型权限分开。</td></tr>
 </table>
-<p><strong>推荐配置：</strong>优先选择服务端实际提供的 GPT-6 Astra 或 GPT-5.6 Sol，在自己的 Codex 中按任务需要设置完全访问，并选择该模型支持的高推理档位。<code>xhigh</code> 仅在模型支持时启用；模型与客户端能力以实际返回为准。</p>
+<p><strong>推荐配置：</strong>优先选择服务端实际提供的 GPT-6 Astra 或 GPT-6.1 Sol，在自己的 Codex 中按任务需要设置完全访问，并选择该模型支持的高推理档位。<code>xhigh</code> 仅在模型支持时启用；模型与客户端能力以实际返回为准。</p>
 <ol>
 <li><strong>测试连接：</strong>在桌面端“冷咖啡中转”页填写 API 地址与 API Key，点击“测试接入状态”读取真实模型列表。</li>
 <li><strong>复制配置：</strong>选择返回列表中的模型，复制纯 TOML 配置并合并到 <code>%USERPROFILE%\\.codex\\config.toml</code>；配置文本不含 API Key。</li>
@@ -102,12 +102,22 @@ npm test</code></pre>
 
 <h2 id="模型席位">模型席位</h2>
 <table>
-<tr><th>GPT-6 Astra</th><th>Claude Code全模型支持</th><th>Grok 4.7</th></tr>
+<tr><th>GPT-6 Astra全模型支持</th><th>Claude Code全模型支持</th><th>Grok 4.7</th></tr>
 <tr><td>目标 · 实现 · 验收</td><td>约束 · 结构 · 复核</td><td>问题 · 产物 · 待验证项</td></tr>
 <tr><th>DeepSeek v4.1 Flash</th><th>GLM 5.3全模型支持</th><th>Gemini全模型支持</th></tr>
 <tr><td>拆分 · 复现 · 检查</td><td>条目 · 推进 · 交付</td><td>素材 · 组织 · 验证</td></tr>
+<tr><th>豆包</th><th>WorkBuddy</th><th>安装位置</th></tr>
+<tr><td><code>.user_skills/cha-doubao/SKILL.md</code></td><td><code>.workbuddy/skills/cha-workbuddy/SKILL.md</code> 与 <code>AGENTS.md</code></td><td>豆包写入用户技能目录，不写入并列的自带 .skills。WorkBuddy 写入 %USERPROFILE%\\.workbuddy。</td></tr>
 </table>
 <p>以上是仓库中的席位名称与组织方式，不是提供商的模型可用性保证。</p>
+
+<h2 id="工具箱">工具箱</h2>
+<p>桌面端左侧第七页。当前一张卡：IDA Pro 9.x 简体中文界面，来自 <a href="https://github.com/3641397194-wq/ida-zh-cn">ida-zh-cn</a>，按提交 <code>1258dad</code> 收在 <code>tools/ida-zh-cn</code>。</p>
+<table>
+<tr><th align="left">写入</th><th align="left">范围</th></tr>
+<tr><td>复制 <code>ida_zh_cn.py</code> 和 <code>zh_cn.json</code>。设置了 <code>IDAUSR</code> 时用它的第一段，否则用 <code>%APPDATA%\\Hex-Rays\\IDA Pro\\plugins</code>。</td><td>只动这个用户插件目录里的插件文件。IDA 安装目录保持原样。卸载留下你自己的 <code>zh_cn_user.json</code>。</td></tr>
+</table>
+<p>装好后重启 IDA，或在 IDA 里按 Alt+F7 选中插件目录中的 <code>ida_zh_cn.py</code>。界面开关在 Edit → Plugins → 中文界面 开/关。浏览器预览只展示这张卡，写入在桌面端完成。</p>
 
 <h2 id="冷咖啡社群">冷咖啡社群</h2>
 <p>交流用法，讨论模型，分享作品。三个 QQ 群统一展示，点击二维码查看原图；需要闭源工作流、付费授权或定制方案时，加入任一群后<strong>私聊管理员</strong>，由管理员分流沟通。</p>
@@ -129,7 +139,7 @@ for src_name in ('workbench-v3.png','ui-packs.png','ui-relay.png','ui-eval.png',
         body=body.replace(f'docs/assets/{src_name}',f'docs/assets/{name}')
 (ROOT/'README.md').write_text(body,encoding='utf-8')
 css='''*{box-sizing:border-box}body{margin:0;color:#1f2328;background:#fff;font:14px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}a{color:#0969da;text-decoration:none}a:hover{text-decoration:underline}.appbar{background:#f6f8fa;border-bottom:1px solid #d1d9e0;padding:18px 30px;display:flex;justify-content:space-between;align-items:center;gap:20px}.repo-name{font-size:14px;font-weight:600}.preview-label{font-size:12px;color:#656d76}.repo-tabs{background:#f6f8fa;padding:0 30px;display:flex;gap:25px;border-bottom:1px solid #d1d9e0}.repo-tabs span{padding:12px 0;font-size:13px}.repo-tabs .selected{border-bottom:2px solid #f78166}.container{max-width:1200px;padding:28px;margin:auto}.notice{border:1px solid #d1d9e0;border-radius:7px;background:#f6f8fa;padding:14px 18px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;gap:20px}.notice a{background:#1f2328;color:#fff;border-radius:6px;padding:8px 14px;white-space:nowrap}.repo-grid{display:grid;grid-template-columns:minmax(0,880px) 220px;gap:25px}.readme{border:1px solid #d1d9e0;border-radius:7px;overflow:hidden;min-width:0}.readme-tab{font-size:12px;padding:12px 18px;border-bottom:1px solid #d1d9e0;font-weight:600}.markdown-body{padding:30px;font-size:14px}.markdown-body img{max-width:100%;height:auto}.markdown-body h1{font-size:30px;border-bottom:1px solid #d1d9e0;padding-bottom:12px;margin:22px 0 16px}.markdown-body h2{font-size:22px;border-bottom:1px solid #d1d9e0;padding-bottom:9px;margin:34px 0 16px;scroll-margin-top:20px}.markdown-body p{margin:12px 0 18px}.markdown-body sub{color:#656d76;font-size:11px}.markdown-body table{width:100%;border-collapse:collapse;font-size:12px;margin:20px 0}.markdown-body td,.markdown-body th{border:1px solid #d1d9e0;padding:12px}.markdown-body th{background:#f6f8fa}.markdown-body blockquote{margin:24px 0;border-left:4px solid #c92537;background:#fff7f7;padding:10px 18px;color:#4f353a}.markdown-body blockquote p{margin:7px 0}.markdown-body pre{padding:16px;border-radius:7px;background:#f6f8fa;overflow:auto}.markdown-body code{font-family:Consolas,monospace;font-size:12px}.markdown-body details{border:1px solid #d1d9e0;padding:14px;border-radius:7px;margin-top:20px}.markdown-body summary{cursor:pointer;font-weight:600}.markdown-body hr{border:0;border-top:1px solid #d1d9e0;margin-top:30px}.about h3{font-size:15px;margin:0 0 14px}.about p{font-size:13px;color:#656d76}.about .tag{display:inline-block;font-size:11px;background:#ddf4ff;color:#0969da;border-radius:14px;padding:3px 9px;margin:0 3px 7px 0}.about hr{border:0;border-top:1px solid #d1d9e0;margin:22px 0}.about a{display:block;margin-top:12px;font-size:12px}@media(max-width:900px){.repo-grid{grid-template-columns:1fr}.about{display:none}.container{padding:16px}.markdown-body{padding:20px}.appbar{padding:15px}.preview-label{display:none}}@media(max-width:520px){.markdown-body{padding:12px;font-size:12px}.markdown-body h1{font-size:23px}.markdown-body th,.markdown-body td{padding:5px;font-size:10px}.notice{display:block;font-size:12px}.notice a{display:inline-block;margin-top:10px}.repo-tabs{gap:14px;padding:0 16px}.repo-tabs span{font-size:11px}}'''
-page=f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>冷咖啡 · 仓库主页新版预览</title><style>{css}</style></head><body><header class="appbar"><div class="repo-name">3641397194-wq / <strong>gpt6-Astra</strong></div><span class="preview-label">仓库主页排版预览 · 非 GitHub 在线页面</span></header><nav class="repo-tabs"><span class="selected">代码与说明</span><span>问题讨论</span><span>变更记录</span><span>项目文档</span></nav><div class="container"><div class="notice"><span><strong>本地预览，API 已按 OpenAI 兼容模式接入。</strong>桌面端填写 API Key 后可测试 <code>/models</code>；真实套餐和用量以中转服务端为准。</span><a href="/workbench/">打开软件交互预览 ↗</a></div><div class="repo-grid"><article class="readme"><div class="readme-tab">README.md · 项目主页</div><div class="markdown-body">{body.replace('src="docs/','src="/docs/').replace('href="docs/','href="/docs/')}</div></article><aside class="about"><h3>关于冷咖啡</h3><p>破甲工作台<br>六模型席位、API 中转入口、内置工作流与 QQ 私聊定制。</p><span class="tag">冷咖啡</span><span class="tag">GPT-6 Astra</span><span class="tag">OpenAI API</span><span class="tag">原创界面</span><hr><h3>当前预览</h3><p>3.1.0-preview.1<br>默认 API：coldcoffeeai.com/v1<br>等待顾客 API Key 验证</p><a href="/workbench/">操作新版软件 ↗</a><a href="#冷咖啡中转">查看中转服务 ↓</a><a href="#闭源工作流">闭源工作流：进群私聊 ↓</a><a href="#冷咖啡社群">查看三个 QQ 群 ↓</a><hr><p>不把 API Key、余额或账号信息写入仓库。</p></aside></div></div></body></html>'''
+page=f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>冷咖啡 · 仓库主页新版预览</title><style>{css}</style></head><body><header class="appbar"><div class="repo-name">3641397194-wq / <strong>gpt6-Astra</strong></div><span class="preview-label">仓库主页排版预览 · 非 GitHub 在线页面</span></header><nav class="repo-tabs"><span class="selected">代码与说明</span><span>问题讨论</span><span>变更记录</span><span>项目文档</span></nav><div class="container"><div class="notice"><span><strong>本地预览，API 已按 OpenAI 兼容模式接入。</strong>桌面端填写 API Key 后可测试 <code>/models</code>；真实套餐和用量以中转服务端为准。</span><a href="/workbench/">打开软件交互预览 ↗</a></div><div class="repo-grid"><article class="readme"><div class="readme-tab">README.md · 项目主页</div><div class="markdown-body">{body.replace('src="docs/','src="/docs/').replace('href="docs/','href="/docs/')}</div></article><aside class="about"><h3>关于冷咖啡</h3><p>破甲工作台<br>八模型席位、IDA 工具箱、API 中转入口与 QQ 私聊定制。</p><span class="tag">冷咖啡</span><span class="tag">GPT-6 Astra</span><span class="tag">IDA 汉化</span><span class="tag">原创界面</span><hr><h3>当前预览</h3><p>3.1.0-preview.1<br>默认 API：coldcoffeeai.com/v1<br>等待顾客 API Key 验证</p><a href="/workbench/">操作新版软件 ↗</a><a href="#冷咖啡中转">查看中转服务 ↓</a><a href="#闭源工作流">闭源工作流：进群私聊 ↓</a><a href="#冷咖啡社群">查看三个 QQ 群 ↓</a><hr><p>不把 API Key、余额或账号信息写入仓库。</p></aside></div></div></body></html>'''
 (ROOT/'docs/readme-preview.html').write_text(page,encoding='utf-8')
 # Keep the presentation page and the actual README preview in sync.
 (ROOT/'docs/index.html').write_text(page.replace('href="/workbench/"','href="#上手使用"').replace('打开软件交互预览 ↗','启动软件：查看步骤 ↓').replace('操作新版软件 ↗','查看软件启动步骤 ↓').replace('src="/docs/','src="').replace('href="/docs/','href="'),encoding='utf-8')

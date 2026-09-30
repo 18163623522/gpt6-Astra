@@ -10,6 +10,9 @@ const seatTransactions = new SeatTransactions();
 const { ActivationGate } = require("./lib/activation-gate");
 const activationGate = new ActivationGate();
 const { detectDirectory } = require("./lib/detect-directory");
+const idaToolbox = require("./lib/ida-toolbox");
+const idaMcp = require("./lib/ida-mcp");
+const { WorkflowEngine, planWorkflow, healthCheckTools } = require("./lib/workflow");
 const { RelayAdapter } = require("./lib/relay-adapter");
 const relayAdapter = new RelayAdapter();
 const { assertTrustedSender, protectWindow } = require("./lib/window-security");
@@ -17,14 +20,22 @@ const WORKBENCH_ENTRY = path.join(__dirname, "workbench", "index.html");
 
 const COMMUNITY = {
   qq: [
-    { name: "交流群", value: "1057540028" },
-    { name: "专题群", value: "1077074552" },
+    { name: "ai交流1群", value: "1057540028" },
+    { name: "ai交流2群", value: "1077074552" },
     { name: "Cool coffeeAI交流", value: "618179023" },
   ],
 };
 
 let splashWindow;
 let mainWindow;
+
+function emitWorkflow(event) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("coldbrew:workflow-event", event);
+  }
+}
+
+const workflowEngine = new WorkflowEngine({ emit: emitWorkflow });
 
 function handleTrusted(channel, handler) {
   ipcMain.handle(channel, (event, ...args) => {
@@ -70,7 +81,9 @@ function createMain() {
     },
   });
   protectWindow(mainWindow);
-  mainWindow.loadFile(WORKBENCH_ENTRY, process.argv.includes("--relay") ? { hash: "relay" } : {});
+  const seatArg = process.argv.find((item) => item.startsWith("--seat="));
+  const hash = process.argv.includes("--relay") ? "relay" : process.argv.includes("--workflow") ? "workflow" : (seatArg ? seatArg.slice("--seat=".length) : "");
+  mainWindow.loadFile(WORKBENCH_ENTRY, hash ? { hash } : {});
 }
 
 handleTrusted("coldbrew:meta", () => ({
@@ -138,6 +151,27 @@ handleTrusted("coldbrew:relay", async (_event, action, payload = {}) => {
   throw new Error("未知中转操作");
 });
 
+handleTrusted("coldbrew:tools-health", (_event, payload = {}) => healthCheckTools(payload?.ids));
+handleTrusted("coldbrew:workflow-templates", () => workflowEngine.templates());
+handleTrusted("coldbrew:workflows", () => workflowEngine.templates());
+handleTrusted("coldbrew:workflow-plan", (_event, payload = {}) => planWorkflow(payload));
+handleTrusted("coldbrew:workflow-start", (_event, payload = {}) => workflowEngine.start(payload));
+handleTrusted("coldbrew:workflow-status", (_event, taskId) => workflowEngine.get(taskId));
+handleTrusted("coldbrew:workflow-list", () => workflowEngine.list());
+handleTrusted("coldbrew:workflow-pause", (_event, taskId) => workflowEngine.pause(taskId));
+handleTrusted("coldbrew:workflow-resume", (_event, payload = {}) => {
+  const id = payload?.id || payload?.taskId || payload;
+  return workflowEngine.resume(id, payload?.input || {});
+});
+handleTrusted("coldbrew:workflow-cancel", (_event, taskId) => workflowEngine.cancel(taskId));
+handleTrusted("coldbrew:workflow-clear", (_event, taskId) => workflowEngine.clear(taskId));
+handleTrusted("coldbrew:ida-status", (_event, payload = {}) => idaMcp.probeIdaMcp(payload));
+handleTrusted("coldbrew:ida-call", (_event, payload = {}) => {
+  const tool = payload?.tool || payload?.name;
+  if (!tool) throw new Error("IDA MCP 工具名不能为空。");
+  return idaMcp.callIdaMcp(tool, payload.args || payload.arguments || {}, payload);
+});
+
 handleTrusted("coldbrew:compose", (_event, payload) => workbenchCore.compose(payload));
 handleTrusted("coldbrew:evaluate", (_event, answer, options) => workbenchCore.evaluate(answer, options));
 
@@ -145,6 +179,64 @@ handleTrusted("coldbrew:inspect", () => seatRuntime.inspectAll());
 
 handleTrusted("coldbrew:gemini", (_event, verb, payload = {}) => geminiSeat.run(verb, payload.home));
 handleTrusted("coldbrew:seat", (_event, seatId, verb, payload = {}) => seatRuntime.run(String(seatId || ""), verb, payload.home));
+
+handleTrusted("coldbrew:toolbox", async (_event, payload = {}) => {
+  const action = String(payload.action || "status");
+  if (action === "status") return idaToolbox.status();
+  if (action === "install" || action === "uninstall") {
+    const current = idaToolbox.status();
+    const confirm = await dialog.showMessageBox(mainWindow, {
+      type: "warning",
+      title: "冷咖啡 · IDA 汉化",
+      message: action === "install" ? "把汉化插件复制到 IDA 用户插件目录" : "删除汉化插件文件，留下 zh_cn_user.json",
+      detail: current.target,
+      buttons: ["取消", "确认执行"],
+      defaultId: 0,
+      cancelId: 0,
+    });
+    if (confirm.response !== 1) return { canceled: true, ...current };
+    return action === "install" ? idaToolbox.install() : idaToolbox.uninstall();
+  }
+  if (action === "reveal") {
+    const current = idaToolbox.status();
+    if (!current.targetExists) throw new Error("插件目录还不存在，先安装一次");
+    const opened = await shell.openPath(current.target);
+    if (opened) throw new Error(opened);
+    return current;
+  }
+  if (action === "mcp-status") return idaMcp.status();
+  if (action === "mcp-install" || action === "mcp-uninstall") {
+    const current = idaMcp.status();
+    const confirm = await dialog.showMessageBox(mainWindow, {
+      type: "warning",
+      title: "冷咖啡 · IDA MCP",
+      message: action === "mcp-install" ? "把 IDA MCP 写进各席位自己的配置文件" : "从各席位配置里去掉 IDA MCP",
+      detail: `${current.url}\n只改 ida-pro-mcp 这一项。豆包没有配置文件，要在连接器里手填。`,
+      buttons: ["取消", "确认执行"],
+      defaultId: 0,
+      cancelId: 0,
+    });
+    if (confirm.response !== 1) return { canceled: true, ...current };
+    return action === "mcp-install" ? idaMcp.installClients() : idaMcp.uninstallClients();
+  }
+  if (action === "mcp-plugin" || action === "mcp-plugin-uninstall") {
+    const current = idaMcp.status();
+    const confirm = await dialog.showMessageBox(mainWindow, {
+      type: "warning",
+      title: "冷咖啡 · IDA MCP 插件",
+      message: action === "mcp-plugin" ? "把 ida_mcp 插件复制到 IDA 用户插件目录" : "从用户插件目录移除 ida_mcp",
+      detail: current.plugin.target,
+      buttons: ["取消", "确认执行"],
+      defaultId: 0,
+      cancelId: 0,
+    });
+    if (confirm.response !== 1) return { canceled: true, ...current };
+    if (action === "mcp-plugin-uninstall") return idaMcp.uninstallPlugin();
+    const source = await idaMcp.installPackage();
+    return idaMcp.installPlugin({ pluginSource: source });
+  }
+  throw new Error("未知工具箱操作");
+});
 
 handleTrusted("coldbrew:open-docs", async () => {
   const packagedDocs = path.join(process.resourcesPath, "public", "docs", "index.html");

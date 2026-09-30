@@ -9,7 +9,7 @@
   "license": "MIT",
   "scripts": {
     "start": "electron .",
-    "check": "node --check src/workbench/pack-controls.js && node --check src/workbench/workbench.js && node --check src/shared/workbench-core.js && npm test && node --check src/main.js && node --check src/preload.js && node --check src/renderer/app.js && node --check src/lib/prompt-engine.js && node --check src/lib/gemini-seat.js && node --check src/lib/seat-packs.js && node --check src/lib/seat-runtime.js && node src/lib/seat-selftest.js && python ..\\tools\\seat_selftest.py",
+    "check": "node --check src/workbench/pack-controls.js && node --check src/workbench/workbench.js && node --check src/shared/workbench-core.js && npm test && node --check src/main.js && node --check src/preload.js && node --check src/renderer/app.js && node --check src/lib/prompt-engine.js && node --check src/lib/gemini-seat.js && node --check src/lib/seat-packs.js && node --check src/lib/seat-runtime.js && node --check src/lib/ida-toolbox.js && node --check src/lib/ida-mcp.js && node src/lib/seat-selftest.js && python ..\\tools\\seat_selftest.py",
     "pack:win": "electron-builder --win portable --publish never",
     "pack:mac": "electron-builder --mac dmg zip --publish never",
     "pack:linux": "electron-builder --linux AppImage deb --publish never",
@@ -45,6 +45,11 @@
       "!**/*.dmp"
     ],
     "extraResources": [
+      {
+        "from": "../tools/ida-zh-cn",
+        "to": "ida-zh-cn",
+        "filter": ["plugin/**", "LICENSE", "NOTICE.md", "VENDORED.txt"]
+      },
       {
         "from": "../docs",
         "to": "public/docs",
