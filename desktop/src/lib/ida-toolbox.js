@@ -1,6 +1,7 @@
 "use strict";
 
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 const crypto = require("node:crypto");
 
@@ -26,11 +27,30 @@ function assertPluginDir(target) {
 function resolveTarget(options = {}) {
   if (options.target) return { target: assertPluginDir(options.target), targetSource: "override" };
   const env = options.env || process.env;
-  const idausr = String(env.IDAUSR || "").split(";")[0].trim();
+  const home = options.home || os.homedir();
+  const platform = options.platform || process.platform;
+  // IDAUSR accepts a platform-native search path list. Keep the first entry,
+  // matching IDA's own plugin lookup order while preserving Windows drive letters.
+  const delimiter = platform === "win32" ? ";" : ":";
+  let idausr = String(env.IDAUSR || "").split(delimiter)[0].trim();
+  if (idausr === "~") idausr = home;
+  if (idausr.startsWith("~/") || idausr.startsWith("~\\")) idausr = path.join(home, idausr.slice(2));
   if (idausr) return { target: assertPluginDir(path.join(idausr, "plugins")), targetSource: "IDAUSR" };
-  if (!env.APPDATA) throw new Error("找不到 APPDATA，无法定位 IDA 用户插件目录");
+  if (platform === "darwin") {
+    return {
+      target: assertPluginDir(path.join(home, "Library", "Application Support", "Hex-Rays", "IDA Pro", "plugins")),
+      targetSource: "macOS 用户目录",
+    };
+  }
+  if (platform === "linux" || platform === "freebsd" || platform === "openbsd") {
+    return {
+      target: assertPluginDir(path.join(home, ".idapro", "plugins")),
+      targetSource: "Linux 用户目录",
+    };
+  }
+  const appData = String(env.APPDATA || "").trim() || path.join(home, "AppData", "Roaming");
   return {
-    target: assertPluginDir(path.join(env.APPDATA, "Hex-Rays", "IDA Pro", "plugins")),
+    target: assertPluginDir(path.join(appData, "Hex-Rays", "IDA Pro", "plugins")),
     targetSource: "APPDATA",
   };
 }

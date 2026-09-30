@@ -1,7 +1,7 @@
 ## WorkBuddy 技能 · 入席三拍
 
 第一步 认目录
-用户目录是 `%USERPROFILE%\.workbuddy`。技能放在这个目录的 `skills` 下，不放到项目里的 `.workbuddy`。
+用户目录默认是 `~/.workbuddy`（Windows 为 `%USERPROFILE%\.workbuddy`），也可用环境变量 `WORKBUDDY_HOME` 指定。技能放在这个目录的 `skills` 下，不放到项目里的 `.workbuddy`。
 
 第二步 放技能
 写入 `skills/cha-workbuddy/SKILL.md`。`name` 是 `cha-workbuddy`。

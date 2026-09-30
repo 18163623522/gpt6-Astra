@@ -217,6 +217,12 @@ function workbuddyHome(env, home) {
   return target;
 }
 
+function platformDataHome(env = process.env, home = os.homedir(), platform = process.platform) {
+  if (platform === "win32") return String(env.LOCALAPPDATA || "").trim() || path.join(home, "AppData", "Local");
+  if (platform === "darwin") return path.join(home, "Library", "Application Support");
+  return String(env.XDG_DATA_HOME || "").trim() || path.join(home, ".local", "share");
+}
+
 function clients(options = {}) {
   const env = options.env || process.env;
   const home = options.home || os.homedir();
@@ -396,9 +402,17 @@ function uninstallClients(options = {}) {
 function findPython(options = {}) {
   const explicit = options.python && String(options.python).trim();
   if (explicit) return explicit;
-  const local = process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, "Programs", "Python", "Python312", "python.exe");
-  if (local && fs.existsSync(local)) return local;
-  return "python";
+  const env = options.env || process.env;
+  const home = options.home || os.homedir();
+  const platform = options.platform || process.platform;
+  if (platform === "win32") {
+    const local = env.LOCALAPPDATA && path.join(env.LOCALAPPDATA, "Programs", "Python", "Python312", "python.exe");
+    if (local && fs.existsSync(local)) return local;
+    return "python";
+  }
+  // macOS/Linux distributions conventionally expose Python 3 as python3.
+  // The caller can still override this with { python } for a virtualenv.
+  return "python3";
 }
 
 function packageSource(packageDir) {
@@ -407,7 +421,10 @@ function packageSource(packageDir) {
 }
 
 function installPackage(options = {}) {
-  const packageDir = options.packageDir || path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), "AppData", "Local"), "gpt6-Astra", "ida-pro-mcp");
+  const env = options.env || process.env;
+  const home = options.home || os.homedir();
+  const platform = options.platform || process.platform;
+  const packageDir = options.packageDir || path.join(platformDataHome(env, home, platform), "gpt6-Astra", "ida-pro-mcp");
   const existing = packageSource(packageDir);
   if (existing && !options.forcePackage) return existing;
   fs.mkdirSync(packageDir, { recursive: true });
@@ -415,7 +432,7 @@ function installPackage(options = {}) {
     encoding: "utf8",
     timeout: options.timeoutMs || 180000,
     windowsHide: true,
-    env: process.env,
+    env: { ...process.env, ...env },
   });
   if (result.status !== 0) {
     const detail = `${result.stderr || ""}\n${result.stdout || ""}`.trim().slice(-700);
@@ -465,6 +482,7 @@ module.exports = {
   installPlugin,
   uninstallPlugin,
   findPython,
+  platformDataHome,
   parseResponse,
   probeIdaMcp,
   callIdaMcp,

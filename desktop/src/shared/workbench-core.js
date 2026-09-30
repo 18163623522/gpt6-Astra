@@ -12,8 +12,8 @@
     {id:'deepseek',tag:'DeepSeek v4.1 Flash',mark:'04',hint:'问题拆分 → 可复现步骤 → 结果检查'},
     {id:'glm53',tag:'GLM 5.3全模型支持',mark:'05',hint:'任务条目 → 分段推进 → 交付清单'},
     {id:'gemini',tag:'Gemini全模型支持',mark:'06',hint:'素材边界 → 综合组织 → 输出验证'},
-    {id:'doubao',tag:'豆包',mark:'07',hint:'技能落在 .user_skills/cha-doubao，不写入自带 .skills',place:'Doubao\\User Data\\...\\workspace\\.user_skills'},
-    {id:'workbuddy',tag:'WorkBuddy',mark:'08',hint:'技能落在 .workbuddy/skills/cha-workbuddy，入口写 AGENTS.md',place:'%USERPROFILE%\\.workbuddy'}
+    {id:'doubao',tag:'豆包',mark:'07',hint:'技能落在平台用户数据目录的 .user_skills/cha-doubao，不写入自带 .skills',place:'DOUBAO_USER_SKILLS 或平台默认目录'},
+    {id:'workbuddy',tag:'WorkBuddy',mark:'08',hint:'技能落在用户目录的 .workbuddy/skills/cha-workbuddy，入口写 AGENTS.md',place:'WORKBUDDY_HOME 或 ~/.workbuddy'}
   ];
   const PROFILES = [
     {id:'max',label:'全开',code:'MAX',brief:'完整交付、验收与后续步骤'},

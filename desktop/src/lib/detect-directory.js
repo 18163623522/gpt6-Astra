@@ -2,7 +2,12 @@
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {guardPath}=require('./seat-transactions');
 const definitions={codex:[['CODEX_HOME','CODEX_DIR'],'.codex'],claude:[['CLAUDE_CONFIG_DIR','CLAUDE_HOME'],'.claude'],grok:[['GROK_HOME','GROK_DIR'],'.grok'],deepseek:[['DSH_HOME'],'.dsh'],glm53:[['GLM_HOME','ZHIPU_HOME'],'.glm'],gemini:[['GEMINI_HOME','GEMINI_DIR'],'.gemini'],doubao:[['DOUBAO_USER_SKILLS'],'.doubao'],workbuddy:[['WORKBUDDY_HOME'],'.workbuddy']};
-function detectDirectory(seat,{env=process.env,home=os.homedir()}={}){
+function platformDataHome({env=process.env,home=os.homedir(),platform=process.platform}={}){
+ if(platform==='win32')return String(env.LOCALAPPDATA||'').trim()||path.join(home,'AppData','Local');
+ if(platform==='darwin')return path.join(home,'Library','Application Support');
+ return String(env.XDG_DATA_HOME||'').trim()||path.join(home,'.local','share');
+}
+function detectDirectory(seat,{env=process.env,home=os.homedir(),platform=process.platform}={}){
  const def=definitions[seat];if(!def)throw new Error('未知席位');const candidates=[];
  function add(value,source,layout='default'){if(!value)return;value=String(value).trim();if(value.startsWith('~/')||value.startsWith('~\\'))value=path.join(home,value.slice(2));if(!path.isAbsolute(value))throw new Error(`${source} 必须为绝对路径`);const root=path.resolve(value);guardPath(root);if(fs.existsSync(root)&&!fs.statSync(root).isDirectory())throw new Error(`${source} 指向的不是目录`);candidates.push({root,source,layout,exists:fs.existsSync(root)});}
  if(seat==='workbuddy'){
@@ -17,8 +22,7 @@ function detectDirectory(seat,{env=process.env,home=os.homedir()}={}){
  }
  if(seat==='doubao'){
   if(env.DOUBAO_USER_SKILLS&&String(env.DOUBAO_USER_SKILLS).trim()){add(String(env.DOUBAO_USER_SKILLS).trim(),'DOUBAO_USER_SKILLS');return candidates[0];}
-  const local=env.LOCALAPPDATA&&String(env.LOCALAPPDATA).trim()?String(env.LOCALAPPDATA).trim():path.join(home,'AppData','Local');
-  add(path.join(local,'Doubao','User Data','Default','.doubao','agent_mode','workspace','.user_skills'),'豆包用户技能目录');
+  add(path.join(platformDataHome({env,home,platform}),'Doubao','User Data','Default','.doubao','agent_mode','workspace','.user_skills'),'豆包用户技能目录');
   return candidates[0];
  }
  if(seat==='deepseek'){
@@ -34,4 +38,4 @@ function detectDirectory(seat,{env=process.env,home=os.homedir()}={}){
  if(seat==='glm53')add(path.join(home,'.zcode'),'ZCode 配置目录','zcode');
  return candidates.find(c=>c.exists)||candidates[0];
 }
-module.exports={detectDirectory};
+module.exports={detectDirectory,platformDataHome};

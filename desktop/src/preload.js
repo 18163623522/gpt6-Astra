@@ -1,6 +1,7 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("coldbrew", {
+  platform: process.platform,
   transaction: (action, payload) => ipcRenderer.invoke("coldbrew:transaction", action, payload),
   relay: (action, payload) => ipcRenderer.invoke("coldbrew:relay", action, payload),
   compose: (payload) => ipcRenderer.invoke("coldbrew:compose", payload),

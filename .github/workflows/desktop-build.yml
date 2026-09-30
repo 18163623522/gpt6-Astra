@@ -1,0 +1,72 @@
+name: desktop-build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Node and Python checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install desktop dependencies
+        working-directory: desktop
+        run: npm ci
+      - name: Run checks
+        working-directory: desktop
+        run: npm run check
+
+  package:
+    name: Package ${{ matrix.name }}
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows portable
+            os: windows-latest
+            script: pack:win
+            artifact: windows-portable
+          - name: macOS DMG and ZIP
+            os: macos-latest
+            script: pack:mac
+            artifact: macos
+          - name: Linux AppImage and DEB
+            os: ubuntu-latest
+            script: pack:linux
+            artifact: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - name: Install desktop dependencies
+        working-directory: desktop
+        run: npm ci
+      - name: Build desktop package
+        working-directory: desktop
+        run: npm run ${{ matrix.script }}
+      - name: Upload ${{ matrix.name }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: desktop/dist/*
+          if-no-files-found: error
+          retention-days: 14

@@ -64,8 +64,8 @@ body='''<div align="center">
 <p><strong>推荐配置：</strong>优先选择服务端实际提供的 GPT-6 Astra 或 GPT-6.1 Sol，在自己的 Codex 中按任务需要设置完全访问，并选择该模型支持的高推理档位。<code>xhigh</code> 仅在模型支持时启用；模型与客户端能力以实际返回为准。</p>
 <ol>
 <li><strong>测试连接：</strong>在桌面端“冷咖啡中转”页填写 API 地址与 API Key，点击“测试接入状态”读取真实模型列表。</li>
-<li><strong>复制配置：</strong>选择返回列表中的模型，复制纯 TOML 配置并合并到 <code>%USERPROFILE%\\.codex\\config.toml</code>；配置文本不含 API Key。</li>
-<li><strong>启动自己的 Codex：</strong>通过独立按钮复制 API Key 环境变量命令，在 PowerShell 中执行后，从同一终端运行 <code>codex</code>。图形客户端按其接入说明配置密钥与提供商。</li>
+<li><strong>复制配置：</strong>选择返回列表中的模型，复制纯 TOML 配置并合并到 Windows 的 <code>%USERPROFILE%\\.codex\\config.toml</code> 或 macOS/Linux 的 <code>~/.codex/config.toml</code>；配置文本不含 API Key。</li>
+<li><strong>启动自己的 Codex：</strong>复制平台对应的 API Key 设置命令：Windows 使用 PowerShell，macOS/Linux 使用当前终端的 <code>export</code>，然后从同一终端运行 <code>codex</code>。图形客户端按其接入说明配置密钥与提供商。</li>
 <li><strong>发送任务：</strong>日常直接在 Codex 使用。也可在软件任务页主动点击“发送到冷咖啡中转”，真实 POST <code>/responses</code> 并等待完整结果；这一路径当前采用整体返回。</li>
 </ol>
 <p><strong>费用说明：</strong>中转套餐/用量费用与闭源工作流授权费用分开计算。顾客也可以使用自己的订阅账号或其他兼容中转；本仓库不存放任何账号、密钥或余额信息。</p>
@@ -85,10 +85,14 @@ body='''<div align="center">
 <li><strong>确认安装：</strong>确认备份并写入，检查配置文件。严格开关需目标客户端接入消息处理层；浏览器专用目录用于演示，不是客户端真实配置目录。</li>
 <li><strong>输入口令：</strong>重新加载对应客户端后，在对话框单独发送 <code>冷咖啡</code>，显示原欢迎页后再开始任务。</li>
 </ol>
-<p>从项目根目录启动桌面端（需要 Node.js 和 npm）：</p>
+<p>桌面端支持 Windows、macOS 和 Linux。发布包由 GitHub Actions 在三种系统上分别构建；本地开发需要 Node.js 和 npm：</p>
 <pre><code>cd desktop
 npm ci
 npm start</code></pre>
+<p>构建当前系统的发布包：</p>
+<pre><code>npm run pack:win    # Windows portable
+npm run pack:mac    # macOS DMG + ZIP
+npm run pack:linux  # Linux AppImage + DEB</code></pre>
 <p>运行新功能测试：</p>
 <pre><code>cd desktop
 npm test</code></pre>
@@ -107,7 +111,7 @@ npm test</code></pre>
 <tr><th>DeepSeek v4.1 Flash</th><th>GLM 5.3全模型支持</th><th>Gemini全模型支持</th></tr>
 <tr><td>拆分 · 复现 · 检查</td><td>条目 · 推进 · 交付</td><td>素材 · 组织 · 验证</td></tr>
 <tr><th>豆包</th><th>WorkBuddy</th><th>安装位置</th></tr>
-<tr><td><code>.user_skills/cha-doubao/SKILL.md</code></td><td><code>.workbuddy/skills/cha-workbuddy/SKILL.md</code> 与 <code>AGENTS.md</code></td><td>豆包写入用户技能目录，不写入并列的自带 .skills。WorkBuddy 写入 %USERPROFILE%\\.workbuddy。</td></tr>
+<tr><td><code>.user_skills/cha-doubao/SKILL.md</code></td><td><code>.workbuddy/skills/cha-workbuddy/SKILL.md</code> 与 <code>AGENTS.md</code></td><td>豆包按平台数据目录写入用户技能目录，不写入并列的自带 .skills。WorkBuddy 默认写入 Windows 的 %USERPROFILE%\\.workbuddy 或 macOS/Linux 的 ~/.workbuddy。</td></tr>
 </table>
 <p>以上是仓库中的席位名称与组织方式，不是提供商的模型可用性保证。</p>
 
@@ -115,7 +119,7 @@ npm test</code></pre>
 <p>桌面端左侧第七页。当前一张卡：IDA Pro 9.x 简体中文界面，来自 <a href="https://github.com/3641397194-wq/ida-zh-cn">ida-zh-cn</a>，按提交 <code>1258dad</code> 收在 <code>tools/ida-zh-cn</code>。</p>
 <table>
 <tr><th align="left">写入</th><th align="left">范围</th></tr>
-<tr><td>复制 <code>ida_zh_cn.py</code> 和 <code>zh_cn.json</code>。设置了 <code>IDAUSR</code> 时用它的第一段，否则用 <code>%APPDATA%\\Hex-Rays\\IDA Pro\\plugins</code>。</td><td>只动这个用户插件目录里的插件文件。IDA 安装目录保持原样。卸载留下你自己的 <code>zh_cn_user.json</code>。</td></tr>
+<tr><td>复制 <code>ida_zh_cn.py</code> 和 <code>zh_cn.json</code>。设置了 <code>IDAUSR</code> 时用它的第一段；否则 Windows 用 <code>%APPDATA%\\Hex-Rays\\IDA Pro\\plugins</code>，macOS 用 <code>~/Library/Application Support/Hex-Rays/IDA Pro/plugins</code>，Linux 用 <code>~/.idapro/plugins</code>。</td><td>只动这个用户插件目录里的插件文件。IDA 安装目录保持原样。卸载留下你自己的 <code>zh_cn_user.json</code>。</td></tr>
 </table>
 <p>装好后重启 IDA，或在 IDA 里按 Alt+F7 选中插件目录中的 <code>ida_zh_cn.py</code>。界面开关在 Edit → Plugins → 中文界面 开/关。浏览器预览只展示这张卡，写入在桌面端完成。</p>
 

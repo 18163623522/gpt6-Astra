@@ -10,6 +10,20 @@ function homeOf(envKeys, folder) {
   return path.join(os.homedir(), folder);
 }
 
+function platformDataHome(env = process.env, home = os.homedir(), platform = process.platform) {
+  if (platform === "win32") return String(env.LOCALAPPDATA || "").trim() || path.join(home, "AppData", "Local");
+  if (platform === "darwin") return path.join(home, "Library", "Application Support");
+  return String(env.XDG_DATA_HOME || "").trim() || path.join(home, ".local", "share");
+}
+
+function realpathOrSelf(target) {
+  try {
+    return fs.realpathSync(target);
+  } catch {
+    return target;
+  }
+}
+
 function deepseekHarnessHome() {
   const configured = process.env.DSH_HOME?.trim();
   if (!configured) return path.join(os.homedir(), '.dsh');
@@ -106,15 +120,14 @@ function seatHomes() {
     glm53: homeOf(["GLM_HOME", "ZCODE_HOME", "ZHIPU_HOME"], ".glm"),
     gemini: homeOf(["GEMINI_HOME", "GEMINI_DIR"], ".gemini"),
     doubao: doubaoSkillsHome(),
-    workbuddy: fs.realpathSync(homeOf(["WORKBUDDY_HOME"], ".workbuddy")),
+    workbuddy: realpathOrSelf(homeOf(["WORKBUDDY_HOME"], ".workbuddy")),
   };
 }
 
-function doubaoSkillsHome() {
-  const configured = String(process.env.DOUBAO_USER_SKILLS || "").trim();
+function doubaoSkillsHome({ env = process.env, home = os.homedir(), platform = process.platform } = {}) {
+  const configured = String(env.DOUBAO_USER_SKILLS || "").trim();
   if (configured) return path.resolve(configured);
-  const local = String(process.env.LOCALAPPDATA || "").trim() || path.join(os.homedir(), "AppData", "Local");
-  return path.join(local, "Doubao", "User Data", "Default", ".doubao", "agent_mode", "workspace", ".user_skills");
+  return path.join(platformDataHome(env, home, platform), "Doubao", "User Data", "Default", ".doubao", "agent_mode", "workspace", ".user_skills");
 }
 
 function workbuddyLoader(begin, end) {
@@ -412,4 +425,4 @@ function inspectAll() {
   };
 }
 
-module.exports = { PACK_IDS, preview, deploy, verify, restore, run, inspectAll, plan, seatHomes };
+module.exports = { PACK_IDS, preview, deploy, verify, restore, run, inspectAll, plan, seatHomes, doubaoSkillsHome, platformDataHome };

@@ -11,7 +11,7 @@ description: WorkBuddy 用户技能。安装位置是用户目录 .workbuddy/ski
 产品：{{APP_TITLE}}
 控制词：{{CONTROL_WORD}}
 
-安装两处：`%USERPROFILE%\.workbuddy\AGENTS.md` 里的入口段落，以及 `.workbuddy/skills/cha-workbuddy/SKILL.md`。环境变量 `WORKBUDDY_HOME` 可以改用户目录。
+安装两处：用户目录 `.workbuddy/AGENTS.md` 里的入口段落，以及 `.workbuddy/skills/cha-workbuddy/SKILL.md`。Windows 默认位置是 `%USERPROFILE%\.workbuddy`，macOS/Linux 默认位置是 `~/.workbuddy`；环境变量 `WORKBUDDY_HOME` 可以改用户目录。
 
 ## 启动合同
 

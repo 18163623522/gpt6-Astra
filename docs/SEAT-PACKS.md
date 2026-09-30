@@ -75,8 +75,10 @@ DeepSeek 席位现在面向 `deepseek-ai/deepseek-harness`（命令 `dsh`）。�
 
 小类拆法对齐 GitHub 公开 skill 库的「一类一面」结构（Claude-Red、rev-skills 121 原子技能、pentest-skills 的 /hunt injection、DFIR 的 memory/log/pcap），正文全部原创三拍。
 
-```powershell
+```bash
 python coldbrew.py --activate 冷咖啡 --seat grok --action preview --json
-python coldbrew.py --activate 冷咖啡 --seat claude --action deploy --home $env:TEMP\cha-claude-home --json
-python tools\seat_selftest.py
+python coldbrew.py --activate 冷咖啡 --seat claude --action deploy --home "$TMPDIR/cha-claude-home" --json
+python tools/seat_selftest.py
 ```
+
+Windows PowerShell 可将临时目录写成 `$env:TEMP\\cha-claude-home`；macOS/Linux 使用 `$TMPDIR/cha-claude-home` 或任意绝对目录。桌面端还提供 `npm run pack:win`、`npm run pack:mac` 和 `npm run pack:linux` 三个打包入口。

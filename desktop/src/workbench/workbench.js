@@ -148,7 +148,8 @@ function relayConfigText() {
   const baseUrl=relayBaseUrl();
   const modelId=relayInput('relay-provider','MODEL_ID');
   const effort=['gpt-6-astra','gpt-6.1-sol'].includes(modelId)?'model_reasoning_effort = "xhigh"\n':'';
-  return `# 冷咖啡 · 合并到 %USERPROFILE%\\.codex\\config.toml
+  const configPath=window.coldbrew?.platform==='win32'?'%USERPROFILE%\\.codex\\config.toml':'~/.codex/config.toml';
+  return `# 冷咖啡 · 合并到 ${configPath}
 # 保留已有配置；同名键与 provider 配置只保留一份。
 model_provider = "coldcoffee"
 model = ${JSON.stringify(modelId)}
@@ -165,8 +166,12 @@ requires_openai_auth = false
 function relayEnvText() {
   const key=relayInput('relay-api-key');
   if(!key) throw new Error('请先填写 API Key');
-  const quoted="'"+key.replace(/'/g,"''")+"'";
-  return `[Environment]::SetEnvironmentVariable('COLDCOFFEE_API_KEY', ${quoted}, 'User')\n$env:COLDCOFFEE_API_KEY = ${quoted}\n# 完全退出并重新打开 Codex，使新启动的进程继承环境变量。`;
+  if(window.coldbrew?.platform==='win32') {
+    const quoted="'"+key.replace(/'/g,"''")+"'";
+    return `[Environment]::SetEnvironmentVariable('COLDCOFFEE_API_KEY', ${quoted}, 'User')\n$env:COLDCOFFEE_API_KEY = ${quoted}\n# 完全退出并重新打开 Codex，使新启动的进程继承环境变量。`;
+  }
+  const quoted="'"+key.replace(/'/g,"'\\''")+"'";
+  return `export COLDCOFFEE_API_KEY=${quoted}\n# 在同一终端启动 Codex，使新进程继承环境变量。`;
 }
 function lockRelayInputs(locked) {
   for(const id of ['relay-api-base','relay-api-key','relay-provider','relay-test','relay-refresh','relay-sync']) $(id).disabled=locked;
