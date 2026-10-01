@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/assets/coldcoffee-cover-v5-2a16c6d53e7a.jpg" width="100%" alt="冷咖啡黑白漫画主视觉，夜班吧台和一杯冰美式" />
+  <img src="docs/assets/coldcoffee-cover-v5-80a57a233bf7.jpg" width="100%" alt="冷咖啡黑白漫画主视觉，夜班吧台和一杯冰美式" />
   <h1>冷咖啡 · 破甲工作台</h1>
   <p><strong>九个软件 · 一键破甲 · 一键卸载 · Windows / macOS / Linux</strong></p>
   <p>打勾，按一下。打开软件后发「冷咖啡」。不想要了，按卸载，文件回到写入之前。</p>
