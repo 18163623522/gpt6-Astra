@@ -63,7 +63,7 @@ async function submitToRelay() {
   const modelId = relayInput('relay-provider');
   if (!window.coldbrew?.relay || !state.relayReady || !state.relayModels.includes(modelId)) {
     page('relay');
-    toast('先填写 API Key、测试连接并选择服务器模型');
+    toast('先贴 Key，测通，再选名单里的模型');
     return;
   }
   const revision = state.relayRevision;
@@ -125,19 +125,19 @@ function relayInput(id, fallback='') {
 function relayBaseUrl() {
   const value=relayInput('relay-api-base');
   let url;
-  try { url=new URL(value); } catch { throw new Error('请填写有效的 API Base URL'); }
+  try { url=new URL(value); } catch { throw new Error('地址要带 https://，像现在框里这样'); }
   if(url.username||url.password||value.includes('?')||value.includes('#')) {
-    throw new Error('API 地址仅填写协议、主机与路径；凭据请填在 API Key 输入框');
+    throw new Error('地址里别带账号密码，Key 贴在下面');
   }
   const key=relayInput('relay-api-key');
   let decoded=value;
-  try { decoded=decodeURIComponent(value); } catch { throw new Error('API 地址包含无效编码'); }
+  try { decoded=decodeURIComponent(value); } catch { throw new Error('地址里有认不出的字符'); }
   if(key&&[value,decoded].some(part=>part.includes(key)||part.includes(encodeURIComponent(key)))) {
-    throw new Error('API 地址中含有 Key，请将凭据移至 API Key 输入框');
+    throw new Error('Key 贴在下面那个框，别写进地址');
   }
   const loopback=/^http:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::\d{1,5})?(?:\/|$)/i.test(value);
   if(url.protocol!=='https:'&&!(url.protocol==='http:'&&loopback)) {
-    throw new Error('API 地址须使用 HTTPS；HTTP 仅供本机回环测试');
+    throw new Error('地址要用 https://');
   }
   return url.href.replace(/\/+$/, '');
 }
@@ -149,8 +149,8 @@ function relayConfigText() {
   const modelId=relayInput('relay-provider','MODEL_ID');
   const effort=['gpt-6-astra','gpt-6.1-sol'].includes(modelId)?'model_reasoning_effort = "xhigh"\n':'';
   const configPath=window.coldbrew?.platform==='win32'?'%USERPROFILE%\\.codex\\config.toml':'~/.codex/config.toml';
-  return `# 冷咖啡 · 合并到 ${configPath}
-# 保留已有配置；同名键与 provider 配置只保留一份。
+  return `# 贴进 Codex 的 ${configPath}
+# 已有的同名项留一份就行。
 model_provider = "coldcoffee"
 model = ${JSON.stringify(modelId)}
 ${effort}
@@ -160,18 +160,18 @@ base_url = ${JSON.stringify(baseUrl)}
 env_key = "COLDCOFFEE_API_KEY"
 wire_api = "responses"
 requires_openai_auth = false
-# Key 使用单独的“复制 Key 设置命令”按钮配置。
-# 完全访问在 Codex 客户端设置。`;
+# Key 用旁边那个「把 Key 记到这台电脑」。
+# 完全访问在 Codex 里打开。`;
 }
 function relayEnvText() {
   const key=relayInput('relay-api-key');
-  if(!key) throw new Error('请先填写 API Key');
+  if(!key) throw new Error('先贴上 Key');
   if(window.coldbrew?.platform==='win32') {
     const quoted="'"+key.replace(/'/g,"''")+"'";
-    return `[Environment]::SetEnvironmentVariable('COLDCOFFEE_API_KEY', ${quoted}, 'User')\n$env:COLDCOFFEE_API_KEY = ${quoted}\n# 完全退出并重新打开 Codex，使新启动的进程继承环境变量。`;
+    return `[Environment]::SetEnvironmentVariable('COLDCOFFEE_API_KEY', ${quoted}, 'User')\n$env:COLDCOFFEE_API_KEY = ${quoted}\n# 跑完后把 Codex 完全退出再打开。`;
   }
   const quoted="'"+key.replace(/'/g,"'\\''")+"'";
-  return `export COLDCOFFEE_API_KEY=${quoted}\n# 在同一终端启动 Codex，使新进程继承环境变量。`;
+  return `export COLDCOFFEE_API_KEY=${quoted}\n# 在同一个终端里打开 Codex。`;
 }
 function lockRelayInputs(locked) {
   for(const id of ['relay-api-base','relay-api-key','relay-provider','relay-test','relay-refresh','relay-sync']) $(id).disabled=locked;
@@ -181,7 +181,7 @@ function setRelayConnection(kind,title,detail) {
   $('relay-connection-state').dataset.state=kind;
   $('relay-connection-title').textContent=title;
   $('relay-connection-detail').textContent=detail;
-  $('relay-state-label').textContent=kind==='ready'?'API 验证通过':kind==='preview'?'浏览器预览':kind==='error'?'待处理':'等待验证';
+  $('relay-state-label').textContent=kind==='ready'?'测过了':kind==='preview'?'先看样子':kind==='error'?'还没用上':'等你点测试';
   $('relay-state-label').dataset.state=kind;
   if(kind!=='ready') state.relayReady=false;
   setRelaySubmitEnabled(state.relayReady);
@@ -189,7 +189,7 @@ function setRelayConnection(kind,title,detail) {
 function updateRelaySelection() {
   const modelId=relayInput('relay-provider');
   state.relayProvider=modelId;
-  $('relay-selected-provider').textContent=modelId||'等待服务器模型列表';
+  $('relay-selected-provider').textContent=modelId||'测完才有名单';
   document.querySelectorAll('.relay-model-card').forEach(card=>{
     const selected=card.dataset.model===modelId;
     card.classList.toggle('selected',selected);
@@ -203,7 +203,7 @@ function updateRelaySelection() {
 function populateRelayModels(models) {
   const entries=Array.isArray(models)?models:(Array.isArray(models?.data)?models.data:[]);
   const ids=[...new Set(entries.map(item=>typeof item==='string'?item:item?.id).filter(id=>typeof id==='string'&&id.trim()))];
-  if(!ids.length) throw new Error('服务器未返回可选模型');
+  if(!ids.length) throw new Error('官网没返回模型，再测一次');
   const previous=relayInput('relay-provider');
   state.relayModels=ids;
   $('relay-provider').replaceChildren(...ids.map(id=>{const o=document.createElement('option');o.value=id;o.textContent=id;return o;}));
@@ -213,59 +213,59 @@ function populateRelayModels(models) {
 async function refreshRelayUsage() {
   try {
     const usage=await relayCall('usage');
-    if(!usage||usage.source==='preview') { $('relay-usage-state').textContent='等待真实查询';return; }
+    if(!usage||usage.source==='preview') { $('relay-usage-state').textContent='还没查余额';return; }
     const value=usage.remaining;
-    $('relay-usage-state').textContent=typeof value==='number'&&Number.isFinite(value)?`${value} ${usage.unit||''}`:'服务器未返回余额';
+    $('relay-usage-state').textContent=typeof value==='number'&&Number.isFinite(value)?`${value} ${usage.unit||''}`:'官网没给出余额';
     if(usage.active===false){
-      setRelayConnection('error','API Key 状态未启用','请到冷咖啡中转站查看 Key 状态。');
+      setRelayConnection('error','这个 Key 现在用不了','去 coldcoffeeai.com 看一下 Key。');
       $('relay-access-state').textContent='Key 未启用';
     }
-  } catch(error) { $('relay-usage-state').textContent=`查询失败：${error.message}`; }
+  } catch(error) { $('relay-usage-state').textContent=`没查到：${error.message}`; }
 }
 async function refreshRelayStatus({probe=false}={}) {
   if(probe) return configureRelayFromForm();
-  setRelayConnection(window.coldbrew?.relay?'idle':'preview','填写 API Key 后开始测试',window.coldbrew?.relay?'桌面端将连接填写的 API 地址。':'当前为浏览器界面预览；真实 API 请求在桌面版执行。');
+  setRelayConnection(window.coldbrew?.relay?'idle':'preview','贴上 Key，点一下测试',window.coldbrew?.relay?'会连到你上面填的地址。':'现在只是看样子。用桌面里的软件，才会真的去问。');
 }
 async function configureRelayFromForm() {
   if(state.relayTesting||state.relayBusy) return;
   const key=relayInput('relay-api-key');
   let base;
-  try { base=relayBaseUrl(); } catch(error) {setRelayConnection('error','请检查 API 地址',error.message);return;}
-  if(!key){setRelayConnection('idle','请填写 API 地址与 Key','填好后点击测试接入状态。');return;}
-  if(!window.coldbrew?.relay){setRelayConnection('preview','请在桌面版测试 API','浏览器预览仅展示交互；真实请求由桌面版执行。');return;}
+  try { base=relayBaseUrl(); } catch(error) {setRelayConnection('error','地址看起来不对',error.message);return;}
+  if(!key){setRelayConnection('idle','还差 Key','贴上买到的 Key，再点测试。');return;}
+  if(!window.coldbrew?.relay){setRelayConnection('preview','用打开的这个软件再测','网页里只能看样子。');return;}
   state.relayTesting=true;
   const revision=++state.relayRevision;
   lockRelayInputs(true);
-  setRelayConnection('idle','正在验证 API','读取模型列表与用量状态。');
-  $('relay-access-state').textContent='验证中';
-  $('relay-usage-state').textContent='查询中';
+  setRelayConnection('idle','正在问官网','看有哪些模型，还剩多少。');
+  $('relay-access-state').textContent='正在测';
+  $('relay-usage-state').textContent='正在查余额';
   try {
     const config=await relayCall('configure',{mode:'openai',baseUrl:base,authToken:key,wireApi:'responses'});
-    if(!config?.ready) throw new Error('接入参数不完整');
+    if(!config?.ready) throw new Error('地址和 Key 还没填全');
     const probe=await relayCall('test');
     if(revision!==state.relayRevision) return;
-    if(!probe?.ok||probe.preview) throw new Error('尚未获得真实模型列表');
+    if(!probe?.ok||probe.preview) throw new Error('还没拿到模型名单');
     populateRelayModels(probe.models);
     state.relayReady=true;
-    setRelayConnection('ready','模型接口验证通过',`已读取 ${state.relayModels.length} 个模型；任务接口在实际发送时验证。`);
-    $('relay-access-state').textContent='API Key 已通过 /models 验证';
+    setRelayConnection('ready','能用了',`读到 ${state.relayModels.length} 个模型。复制到 Codex 就能聊。`);
+    $('relay-access-state').textContent='Key 能用';
     await refreshRelayUsage();
     try { const catalog=await relayCall('catalog');renderRelayCatalog(catalog,catalog?.source); }
     catch(error) { $('relay-catalog-state').textContent=`工作流信息待确认：${error.message}`; }
-    toast(state.relayReady?'接入测试完成，可以复制配置或发送任务':'模型列表已读取；请处理 Key 状态提示');
+    toast(state.relayReady?'测通了。复制到 Codex 就能用。':'名单读到了。看一下上面的 Key 提示。');
   } catch(error) {
     state.relayModels=[];
-    $('relay-access-state').textContent='验证未通过';
-    $('relay-usage-state').textContent='未查询';
-    setRelayConnection('error','API 验证失败',error.message);
+    $('relay-access-state').textContent='这次没通过';
+    $('relay-usage-state').textContent='还没查余额';
+    setRelayConnection('error','没测通',error.message);
   } finally {state.relayTesting=false;lockRelayInputs(false);setRelaySubmitEnabled(state.relayReady);}
 }
 function invalidateRelayConfig() {
   state.relayRevision++;
   state.relayModels=[];
-  $('relay-access-state').textContent='接入信息已修改，请重新测试';
-  $('relay-usage-state').textContent='待重新查询';
-  setRelayConnection('idle','接入信息已更新','重新测试后再发送，避免使用旧 Key 或旧地址。');
+  $('relay-access-state').textContent='改过了，再测一次';
+  $('relay-usage-state').textContent='还没重新查';
+  setRelayConnection('idle','你改过了','再测一次，用现在贴的 Key 和地址。');
 }
 function renderRelayCatalog(catalog,source='product') {
   const verified=['openai','remote'].includes(source)&&catalog?.verified!==false;
@@ -288,11 +288,11 @@ function renderRelay() {
     const card=document.createElement('article');card.className='relay-model-card';card.dataset.model=model.id;
     const mark=document.createElement('div');mark.className='model-mark';mark.textContent=model.mark;
     const title=document.createElement('h3');title.textContent=model.name;
-    const desc=document.createElement('p');desc.textContent='推荐 xhigh 推理；请在 Codex 开启完全访问。模型可用性以 API 返回为准。';
+    const desc=document.createElement('p');desc.textContent='推理开高档。完全访问在 Codex 里打开。有没有这个模型，以测出来的列表为准。';
     const choose=button('选择推荐模型',()=>{
-      if(state.relayReady&&!state.relayModels.includes(model.id)){toast('该 ID 未出现在服务器列表，请在上方选择实际模型');return;}
+      if(state.relayReady&&!state.relayModels.includes(model.id)){toast('官网名单里没有这个，用上面列表里的');return;}
       if(!Array.from($('relay-provider').options).some(o=>o.value===model.id)){
-        const o=document.createElement('option');o.value=model.id;o.textContent=`${model.name} · 待验证`;$('relay-provider').append(o);
+        const o=document.createElement('option');o.value=model.id;o.textContent=`${model.name} · 再测一次`;$('relay-provider').append(o);
       }
       $('relay-provider').value=model.id;updateRelaySelection();
     });
@@ -341,18 +341,18 @@ async function workflowIdaProbe(){const url=relayInput('workflow-ida-url','http:
 async function workflowIdaCall(){const tool=relayInput('workflow-ida-tool','server_health');let args={};try{args=JSON.parse(relayInput('workflow-ida-args','{}')||'{}');}catch{toast('IDA 参数必须是有效 JSON');return;}const url=relayInput('workflow-ida-url','http://127.0.0.1:13337/mcp');workflowSetState('workflow-ida-state','调用中','running');try{const result=window.coldbrew?.idaCall?await window.coldbrew.idaCall({tool,args,url,sessionId:state.workflow.ida?.sessionId,timeoutMs:20000}):{ok:false,error:'浏览器预览不调用本机 IDA'};$('workflow-ida-output').textContent=workflowJson(result);workflowSetState('workflow-ida-state',result.ok?'调用完成':'调用失败',result.ok?'completed':'failed');workflowLog(`${result.ok?'IDA 工具完成':'IDA 工具失败'} · ${tool}`);}catch(error){workflowSetState('workflow-ida-state','调用失败','failed');$('workflow-ida-output').textContent=error.message;workflowLog(`IDA 调用失败 · ${error.message}`);}}
 function bindWorkflow(){if(!$('workflow-plan'))return;$('workflow-plan').addEventListener('click',workflowPlanAction);$('workflow-health').addEventListener('click',workflowHealthAction);$('workflow-start').addEventListener('click',()=>workflowStartAction());$('workflow-ai').addEventListener('click',workflowAiAction);$('workflow-pause').addEventListener('click',async()=>{const id=state.workflow.task?.taskId||state.workflow.task?.id;if(id&&window.coldbrew?.workflowPause)renderWorkflowTask(await window.coldbrew.workflowPause(id));});$('workflow-resume').addEventListener('click',async()=>{const id=state.workflow.task?.taskId||state.workflow.task?.id;if(id&&window.coldbrew?.workflowResume)renderWorkflowTask(await window.coldbrew.workflowResume(id));});$('workflow-cancel').addEventListener('click',async()=>{const id=state.workflow.task?.taskId||state.workflow.task?.id;if(id&&window.coldbrew?.workflowCancel)renderWorkflowTask(await window.coldbrew.workflowCancel(id));});$('workflow-ida-probe').addEventListener('click',workflowIdaProbe);$('workflow-ida-call').addEventListener('click',workflowIdaCall);$('workflow-copy-report').addEventListener('click',()=>{const task=state.workflow.task;if(!task)return;copy((task.stages||[]).map(stage=>`${stage.label}: ${stage.status}${stage.result?.reportPath?`\n报告：${stage.result.reportPath}`:''}`).join('\n'));});$('workflow-mode').addEventListener('change',()=>{state.workflow.plan=null;renderWorkflowPlan(null);});if(window.coldbrew?.onWorkflow)window.coldbrew.onWorkflow(workflowHandleEvent);}
 
-function renderIdaStatus(status){const state=$('ida-state');if(!state)return;const buttons=['ida-install','ida-uninstall','ida-reveal','ida-refresh'];if(!status){state.textContent='仅桌面端写入';$('ida-target').textContent='浏览器预览只展示说明，不写入 IDA 用户插件目录。';$('ida-files').replaceChildren();for(const id of buttons)$(id).disabled=true;return;}state.textContent=status.installed?'已安装，内容一致':status.present?'同名文件内容和仓库不一致':'未安装';$('ida-target').textContent=`${status.targetSource} · ${status.target}`;$('ida-files').replaceChildren(...status.files.map(file=>{const li=document.createElement('li');li.textContent=`${file.name} · ${file.present?(file.match?'一致':'不一致'):'缺失'}`;return li;}));for(const id of buttons)$(id).disabled=false;$('ida-reveal').disabled=!status.targetExists;}
-function renderMcpStatus(status){const state=$('ida-mcp-state');if(!state)return;const buttons=['ida-mcp-install','ida-mcp-plugin','ida-mcp-uninstall','ida-mcp-refresh'];if(!status){state.textContent='仅桌面端写入';$('ida-mcp-target').textContent='浏览器预览只展示地址，不改各席位配置。';$('ida-mcp-clients').replaceChildren();for(const id of buttons)$(id).disabled=true;return;}const ready=status.clients.filter(row=>row.installed).length;state.textContent=status.plugin.ready?`插件已在位 · ${ready} 个席位已接入`:`插件未安装 · ${ready} 个席位已接入`;$('ida-mcp-target').textContent=`${status.plugin.targetSource} · ${status.plugin.target}`;if($('ida-mcp-url'))$('ida-mcp-url').textContent=status.url;$('ida-mcp-clients').replaceChildren(...status.clients.map(row=>{const li=document.createElement('li');const mark=row.installed?'已接入':row.kind==='manual'?'手填':row.exists?'未写入':'无文件';li.textContent=`${row.label} · ${mark}${row.file?` · ${row.file}`:''}${row.note?` · ${row.note}`:''}`;return li;}));for(const id of buttons)$(id).disabled=false;}
+function renderIdaStatus(status){const state=$('ida-state');if(!state)return;const buttons=['ida-install','ida-uninstall','ida-reveal','ida-refresh'];if(!status){state.textContent='仅桌面端写入';$('ida-target').textContent='浏览器预览只展示说明，不写入 IDA 用户插件目录。';$('ida-files').replaceChildren();for(const id of buttons)$(id).disabled=true;return;}state.textContent=status.installed?'中文已经装好':status.present?'文件和软件里的不一样，可以再装一次':'还没装中文';$('ida-target').textContent=`插件文件夹 · ${status.target}`;$('ida-files').replaceChildren(...status.files.map(file=>{const li=document.createElement('li');li.textContent=`${file.name} · ${file.present?(file.match?'一样':'不一样'):'没有'}`;return li;}));for(const id of buttons)$(id).disabled=false;$('ida-reveal').disabled=!status.targetExists;}
+function renderMcpStatus(status){const state=$('ida-mcp-state');if(!state)return;const buttons=['ida-mcp-install','ida-mcp-plugin','ida-mcp-uninstall','ida-mcp-refresh'];if(!status){state.textContent='仅桌面端写入';$('ida-mcp-target').textContent='先看地址。点按钮才会写进软件。';$('ida-mcp-clients').replaceChildren();for(const id of buttons)$(id).disabled=true;return;}const ready=status.clients.filter(row=>row.installed).length;state.textContent=status.plugin.ready?`插件好了 · ${ready} 个软件已接上`:`插件还没装 · ${ready} 个软件已接上`;$('ida-mcp-target').textContent=`插件文件夹 · ${status.plugin.target}`;if($('ida-mcp-url'))$('ida-mcp-url').textContent=status.url;$('ida-mcp-clients').replaceChildren(...status.clients.map(row=>{const li=document.createElement('li');const mark=row.installed?'已接入':row.kind==='manual'?'手填':row.exists?'未写入':'无文件';li.textContent=`${row.label} · ${mark}${row.file?` · ${row.file}`:''}${row.note?` · ${row.note}`:''}`;return li;}));for(const id of buttons)$(id).disabled=false;}
 async function toolboxCall(action){const result=await window.coldbrew.toolbox({action});if(result&&!result.canceled){if(String(action).startsWith('mcp'))renderMcpStatus(result);else renderIdaStatus(result);}return result;}
-function bindToolbox(){if(!$('ida-install'))return;$('ida-refresh').addEventListener('click',()=>toolboxCall('status').catch(error=>toast(error.message)));$('ida-install').addEventListener('click',()=>toolboxCall('install').then(result=>{if(result?.canceled)toast('已取消安装');else if(result)toast('已安装到用户插件目录');}).catch(error=>toast(error.message)));$('ida-uninstall').addEventListener('click',()=>toolboxCall('uninstall').then(result=>{if(result?.canceled)toast('已取消卸载');else if(result)toast('已移除汉化插件文件');}).catch(error=>toast(error.message)));$('ida-reveal').addEventListener('click',()=>toolboxCall('reveal').then(()=>toast('已打开插件目录')).catch(error=>toast(error.message)));$('ida-mcp-refresh').addEventListener('click',()=>toolboxCall('mcp-status').catch(error=>toast(error.message)));$('ida-mcp-install').addEventListener('click',()=>toolboxCall('mcp-install').then(result=>{if(result?.canceled)toast('已取消写入');else if(result)toast('IDA MCP 已写入席位配置');}).catch(error=>toast(error.message)));$('ida-mcp-uninstall').addEventListener('click',()=>toolboxCall('mcp-uninstall').then(result=>{if(result?.canceled)toast('已取消');else if(result)toast('已去掉席位里的 IDA MCP');}).catch(error=>toast(error.message)));$('ida-mcp-plugin').addEventListener('click',()=>toolboxCall('mcp-plugin').then(result=>{if(result?.canceled)toast('已取消安装插件');else if(result)toast('IDA MCP 插件已复制到用户插件目录');}).catch(error=>toast(error.message)));if(window.coldbrew?.toolbox){toolboxCall('status').catch(error=>toast(error.message));toolboxCall('mcp-status').catch(error=>toast(error.message));}else{renderIdaStatus(null);renderMcpStatus(null);}}
+function bindToolbox(){if(!$('ida-install'))return;$('ida-refresh').addEventListener('click',()=>toolboxCall('status').catch(error=>toast(error.message)));$('ida-install').addEventListener('click',()=>toolboxCall('install').then(result=>{if(result?.canceled)toast('已取消安装');else if(result)toast('中文装好了，把 IDA 重新打开');}).catch(error=>toast(error.message)));$('ida-uninstall').addEventListener('click',()=>toolboxCall('uninstall').then(result=>{if(result?.canceled)toast('已取消卸载');else if(result)toast('中文卸掉了');}).catch(error=>toast(error.message)));$('ida-reveal').addEventListener('click',()=>toolboxCall('reveal').then(()=>toast('文件夹打开了')).catch(error=>toast(error.message)));$('ida-mcp-refresh').addEventListener('click',()=>toolboxCall('mcp-status').catch(error=>toast(error.message)));$('ida-mcp-install').addEventListener('click',()=>toolboxCall('mcp-install').then(result=>{if(result?.canceled)toast('已取消写入');else if(result)toast('已经写进软件');}).catch(error=>toast(error.message)));$('ida-mcp-uninstall').addEventListener('click',()=>toolboxCall('mcp-uninstall').then(result=>{if(result?.canceled)toast('已取消');else if(result)toast('已经从软件里去掉');}).catch(error=>toast(error.message)));$('ida-mcp-plugin').addEventListener('click',()=>toolboxCall('mcp-plugin').then(result=>{if(result?.canceled)toast('已取消安装插件');else if(result)toast('连接插件放好了，把 IDA 重新打开');}).catch(error=>toast(error.message)));if(window.coldbrew?.toolbox){toolboxCall('status').catch(error=>toast(error.message));toolboxCall('mcp-status').catch(error=>toast(error.message));}else{renderIdaStatus(null);renderMcpStatus(null);}}
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));
 if($('presets')&&$('goal'))$('presets').replaceChildren(...core.PRESETS.map(p=>button(p.label,()=>{$('goal').value=p.goal;$('context').value=p.context;$('constraints').value=p.constraints;$('format').value=p.format;state.profile=p.profile;renderProfiles();toast('已填入示例，编辑后点击本地构建或发送到中转');})));
 if($('compose-form')){$('compose-form').addEventListener('submit',compose);$('copy').addEventListener('click',()=>copy(state.result.text));$('export').addEventListener('click',download);}
 if($('before')&&$('after')){$('before').addEventListener('change',compare);$('after').addEventListener('change',compare);}
 if($('eval-form'))$('eval-form').addEventListener('submit',async event=>{event.preventDefault();try{const answer=$('answer').value,options={format:$('eval-format').value,minLength:Number($('min-length').value),keywords:$('keywords').value};const r=window.coldbrew?.evaluate?await window.coldbrew.evaluate(answer,options):core.evaluate(answer,options);$('eval-score').textContent=`${r.passed} / ${r.total} 项通过`;$('eval-result').replaceChildren(...r.checks.map(c=>{const line=document.createElement('div');line.className=c.ok?'pass':'fail';line.textContent=`${c.ok?'✓':'×'} ${c.name}`;return line;}));}catch(e){toast(e.message);}});
 $('qr-close').addEventListener('click',()=>$('qr-dialog').close());$('qr-dialog').addEventListener('click',e=>{if(e.target===$('qr-dialog'))$('qr-dialog').close();});
-$('repo').addEventListener('click',()=>{const url='https://github.com/3641397194-wq/gpt6-Astra';if(window.coldbrew)window.coldbrew.openExternal(url).catch(e=>toast(e.message));else window.open(url,'_blank','noopener,noreferrer');});
-if(window.coldbrew){document.body.classList.add('desktop');$('environment').textContent='桌面端 · 一键破甲';for(const name of ['minimize','maximize','close'])$(name).addEventListener('click',()=>window.coldbrew[name]());}
+$('repo').addEventListener('click',()=>{const url='https://coldcoffeeai.com/';if(window.coldbrew)window.coldbrew.openExternal(url).catch(e=>toast(e.message));else window.open(url,'_blank','noopener,noreferrer');});
+if(window.coldbrew){document.body.classList.add('desktop');$('environment').textContent='冷咖啡中转';for(const name of ['minimize','maximize','close'])$(name).addEventListener('click',()=>window.coldbrew[name]());}
 document.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key==='Enter'&&$('page-work')?.classList.contains('active')){event.preventDefault();$('compose-form').requestSubmit();}});
 renderSeats();renderProfiles();renderRelay();renderCommunity();bindToolbox();bindWorkflow();refreshRelayStatus();
 window.addEventListener('DOMContentLoaded',()=>{if(location.hash==='#relay')page('relay');});

@@ -21,9 +21,9 @@ const WORKBENCH_ENTRY = path.join(__dirname, "workbench", "index.html");
 
 const COMMUNITY = {
   qq: [
-    { name: "ai交流1群", value: "1057540028" },
-    { name: "ai交流2群", value: "1077074552" },
-    { name: "Cool coffeeAI交流", value: "618179023" },
+    { name: "一群", value: "1057540028" },
+    { name: "二群", value: "1077074552" },
+    { name: "三群", value: "618179023" },
   ],
 };
 
@@ -53,7 +53,7 @@ function createSplash() {
     resizable: false,
     show: false,
     backgroundColor: "#090707",
-    title: APP_TITLE,
+    title: "冷咖啡中转",
     icon: path.join(__dirname, "..", "assets", "icon-v4.png"),
     webPreferences: { contextIsolation: true, sandbox: true },
   });
@@ -71,7 +71,7 @@ function createMain() {
     frame: false,
     show: false,
     backgroundColor: "#080707",
-    title: APP_TITLE,
+    title: "冷咖啡中转",
     icon: path.join(__dirname, "..", "assets", "icon-v4.png"),
     autoHideMenuBar: true,
     webPreferences: {
@@ -189,9 +189,9 @@ handleTrusted("coldbrew:toolbox", async (_event, payload = {}) => {
     const confirm = await dialog.showMessageBox(mainWindow, {
       type: "warning",
       title: "冷咖啡 · IDA 汉化",
-      message: action === "install" ? "把汉化插件复制到 IDA 用户插件目录" : "删除汉化插件文件，留下 zh_cn_user.json",
+      message: action === "install" ? "把中文放进 IDA 的插件文件夹" : "卸掉中文。你的 zh_cn_user.json 留着。",
       detail: current.target,
-      buttons: ["取消", "确认执行"],
+      buttons: ["取消", "就这么做"],
       defaultId: 0,
       cancelId: 0,
     });
@@ -200,7 +200,7 @@ handleTrusted("coldbrew:toolbox", async (_event, payload = {}) => {
   }
   if (action === "reveal") {
     const current = idaToolbox.status();
-    if (!current.targetExists) throw new Error("插件目录还不存在，先安装一次");
+    if (!current.targetExists) throw new Error("还没有插件文件夹，先装一次中文");
     const opened = await shell.openPath(current.target);
     if (opened) throw new Error(opened);
     return current;
@@ -211,9 +211,9 @@ handleTrusted("coldbrew:toolbox", async (_event, payload = {}) => {
     const confirm = await dialog.showMessageBox(mainWindow, {
       type: "warning",
       title: "冷咖啡 · IDA MCP",
-      message: action === "mcp-install" ? "把 IDA MCP 写进各席位自己的配置文件" : "从各席位配置里去掉 IDA MCP",
-      detail: `${current.url}\n只改 ida-pro-mcp 这一项。豆包没有配置文件，要在连接器里手填。`,
-      buttons: ["取消", "确认执行"],
+      message: action === "mcp-install" ? "把 IDA 的连接写进你正在用的软件" : "从这些软件里去掉 IDA 的连接",
+      detail: `${current.url}\n只改这一项连接。豆包要自己在连接器里填。`,
+      buttons: ["取消", "就这么做"],
       defaultId: 0,
       cancelId: 0,
     });
@@ -225,9 +225,9 @@ handleTrusted("coldbrew:toolbox", async (_event, payload = {}) => {
     const confirm = await dialog.showMessageBox(mainWindow, {
       type: "warning",
       title: "冷咖啡 · IDA MCP 插件",
-      message: action === "mcp-plugin" ? "把 ida_mcp 插件复制到 IDA 用户插件目录" : "从用户插件目录移除 ida_mcp",
+      message: action === "mcp-plugin" ? "把连接插件放进 IDA 的插件文件夹" : "从插件文件夹里拿掉连接插件",
       detail: current.plugin.target,
-      buttons: ["取消", "确认执行"],
+      buttons: ["取消", "就这么做"],
       defaultId: 0,
       cancelId: 0,
     });
@@ -278,7 +278,7 @@ handleTrusted("coldbrew:open-docs", async () => {
 
 handleTrusted("coldbrew:open-external", async (_event, value) => {
   const url = String(value || "").trim();
-  if (!/^https:\/\/(?:github\.com|(?:www\.)?coldcoffeeai\.com)(\/|$)/i.test(url)) throw new Error("只允许打开仓库或冷咖啡中转链接");
+  if (!/^https:\/\/(?:github\.com|(?:www\.)?coldcoffeeai\.com)(\/|$)/i.test(url)) throw new Error("这个链接打不开");
   await shell.openExternal(url);
   return url;
 });

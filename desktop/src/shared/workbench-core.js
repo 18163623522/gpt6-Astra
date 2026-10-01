@@ -24,9 +24,9 @@
     {id:'creative',label:'创作',code:'CREATE',brief:'保持角色、语气、风格和连续性'}
   ];
   const COMMUNITY = [
-    {name:'ai交流1群',value:'1057540028',image:'qq-group-1.jpg'},
-    {name:'ai交流2群',value:'1077074552',image:'qq-group-2.jpg'},
-    {name:'Cool coffeeAI交流',value:'618179023',image:'qq-group-3.jpg'}
+    {name:'一群',value:'1057540028',image:'qq-group-1.jpg'},
+    {name:'二群',value:'1077074552',image:'qq-group-2.jpg'},
+    {name:'三群',value:'618179023',image:'qq-group-3.jpg'}
   ];
   const PRESETS = [
     {label:'代码交付',goal:'实现一个可离线使用的 Markdown 笔记编辑器，支持搜索和导出。',context:'桌面应用；先实现最小可用版本。',constraints:'使用中文说明；列出修改文件和测试命令。',format:'markdown',profile:'builder'},
