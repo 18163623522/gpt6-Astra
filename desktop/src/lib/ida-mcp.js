@@ -236,7 +236,79 @@ function clients(options = {}) {
     { id: "gemini", label: "Gemini", kind: "json", file: path.join(home, ".gemini", "settings.json"), keys: ["mcpServers", SERVER], entry: { httpUrl: URL } },
     { id: "doubao", label: "豆包", kind: "manual", note: "豆包没有 mcp.json。连接器里选 HTTP，地址用下面这一条" },
     { id: "workbuddy", label: "WorkBuddy", kind: "json", file: path.join(buddy, "mcp.json"), keys: ["mcpServers", SERVER], entry: { type: "streamableHttp", url: URL, timeout: 30000 }, create: true },
+    { id: "cursor", label: "Cursor", kind: "json", file: path.join(home, ".cursor", "mcp.json"), keys: ["mcpServers", SERVER], entry: { url: URL }, create: true },
   ];
+}
+
+function mcpFileForSeat(seat, root, layout) {
+  if (seat === "claude") return path.join(path.dirname(root), ".claude.json");
+  if (seat === "glm53") {
+    if (layout === "zcode") return path.join(root, "cli", "config.json");
+    return path.join(path.dirname(root), ".zcode", "cli", "config.json");
+  }
+  if (seat === "codex" || seat === "grok") return path.join(root, "config.toml");
+  if (seat === "gemini") return path.join(root, "settings.json");
+  return path.join(root, "mcp.json");
+}
+
+function seatClient(seat, options, create) {
+  const client = clients(options).find((item) => item.id === seat);
+  if (!client) return { code: "unknown" };
+  if (client.kind === "manual") return { code: "manual", client };
+  const copy = { ...client, create: !!create };
+  if (options.root) {
+    const root = path.resolve(String(options.root));
+    if (seat === "cursor") {
+      if (path.basename(root) !== ".cursor") return { code: "location", skipped: "只写用户目录 .cursor", client: copy };
+      if (fs.existsSync(path.join(root, "Cursor.exe")) || fs.existsSync(path.join(root, "resources", "app"))) {
+        return { code: "location", skipped: "这是 Cursor 程序目录", client: copy };
+      }
+    }
+    copy.file = mcpFileForSeat(seat, root, options.layout);
+    if (create) fs.mkdirSync(path.dirname(copy.file), { recursive: true });
+  }
+  return { code: "ready", client: copy };
+}
+
+function blankMcpFile(file) {
+  if (!file || !fs.existsSync(file)) return;
+  const text = fs.readFileSync(file, "utf8");
+  if (!text.trim()) {
+    fs.unlinkSync(file);
+    return;
+  }
+  if (!file.endsWith(".json")) return;
+  let data;
+  try { data = JSON.parse(text); } catch { return; }
+  const prune = (node) => {
+    if (!node || typeof node !== "object" || Array.isArray(node)) return false;
+    for (const key of Object.keys(node)) {
+      if (prune(node[key])) delete node[key];
+    }
+    return Object.keys(node).length === 0;
+  };
+  if (prune(data)) fs.unlinkSync(file);
+}
+
+function attachSeat(seat, options = {}) {
+  const picked = seatClient(seat, options, true);
+  if (picked.code === "unknown") return { ok: false, seat, code: "unknown" };
+  if (picked.code === "manual") return { ok: true, seat, code: "manual" };
+  if (picked.code === "location") return { ok: false, seat, code: "location", skipped: picked.skipped };
+  const row = applyClient(picked.client, options, false);
+  return { ok: row.installed === true, seat, code: row.installed ? "ida" : "skip", file: picked.client.file, skipped: row.skipped || "" };
+}
+
+function detachSeat(seat, options = {}) {
+  const picked = seatClient(seat, options, false);
+  if (picked.code === "unknown") return { ok: false, seat, code: "unknown" };
+  if (picked.code === "manual") return { ok: true, seat, code: "manual" };
+  if (picked.code === "location") return { ok: false, seat, code: "location", skipped: picked.skipped };
+  const row = applyClient(picked.client, options, true);
+  if (row.skipped) return { ok: true, seat, code: "off", file: picked.client.file, skipped: row.skipped };
+  blankMcpFile(picked.client.file);
+  const after = describe(picked.client);
+  return { ok: after.installed !== true, seat, code: after.installed ? "skip" : "off", file: picked.client.file, skipped: row.skipped || "" };
 }
 
 function tomlBlock(enabled) {
@@ -270,8 +342,10 @@ function stripToml(text) {
   const start = text.indexOf(BEGIN);
   const stop = text.indexOf(END);
   if (start < 0 || stop < start) return text;
-  const next = text.slice(stop + END.length).replace(/^\r?\n/, "");
-  return `${text.slice(0, start)}${next}`.replace(/\n{3,}/g, "\n\n");
+  const tail = text.slice(stop + END.length).replace(/^\r?\n/, "");
+  let head = text.slice(0, start);
+  if (!tail.trim()) head = head.replace(/\n\n$/, "\n");
+  return `${head}${tail}`.replace(/\n{3,}/g, "\n\n");
 }
 
 function readJson(file) {
@@ -476,6 +550,8 @@ module.exports = {
   configuredUrl,
   clients,
   status,
+  attachSeat,
+  detachSeat,
   installClients,
   uninstallClients,
   installPackage,

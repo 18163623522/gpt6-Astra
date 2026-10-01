@@ -2,7 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { APP_TITLE, ACTIVATION_WORD, CONTROL_WORD, SEATS, activationReply } = require("./prompt-engine");
 
-const PACK_IDS = ["codex", "claude", "grok", "deepseek", "glm53", "gemini", "doubao", "workbuddy"];
+const PACK_IDS = ["codex", "claude", "grok", "deepseek", "glm53", "gemini", "doubao", "workbuddy", "cursor"];
 const ROUTE_IDS = [
   "cha-bin-unlock",
   "cha-playfield",

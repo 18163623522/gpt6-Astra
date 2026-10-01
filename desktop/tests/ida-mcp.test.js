@@ -16,6 +16,7 @@ function fixture() {
   fs.mkdirSync(path.join(home, ".gemini"), { recursive: true });
   fs.mkdirSync(path.join(home, ".zcode", "cli"), { recursive: true });
   fs.mkdirSync(path.join(home, ".workbuddy"), { recursive: true });
+  fs.mkdirSync(path.join(home, ".cursor"), { recursive: true });
   fs.writeFileSync(path.join(home, ".codex", "config.toml"), "[mcp_servers.node_repl]\ncommand = \"node\"\n");
   fs.writeFileSync(path.join(home, ".grok", "config.toml"), "model = \"grok\"\n\n[mcp_servers.awesun-mcp-server]\ncommand = \"awesun\"\n");
   fs.writeFileSync(path.join(home, ".claude.json"), `${JSON.stringify({ numStartups: 3, mcpServers: { other: { command: "keep" } } }, null, 2)}\n`);
@@ -34,6 +35,7 @@ test("写入各席位 MCP 且不覆盖已有项", () => {
   assert.equal(byId.gemini.installed, true);
   assert.equal(byId.glm53.installed, true);
   assert.equal(byId.workbuddy.installed, true);
+  assert.equal(byId.cursor.installed, true);
   assert.equal(byId.doubao.kind, "manual");
   assert.equal(byId.deepseek.kind, "manual");
   assert.equal(fs.existsSync(path.join(fx.home, ".doubao")), false);
@@ -57,6 +59,9 @@ test("写入各席位 MCP 且不覆盖已有项", () => {
   assert.equal(zcode.mcp.servers["ida-pro-mcp"].url, mcp.URL);
   const buddy = JSON.parse(fs.readFileSync(path.join(fx.home, ".workbuddy", "mcp.json"), "utf8"));
   assert.equal(buddy.mcpServers["ida-pro-mcp"].type, "streamableHttp");
+  const cursor = JSON.parse(fs.readFileSync(path.join(fx.home, ".cursor", "mcp.json"), "utf8"));
+  assert.equal(cursor.mcpServers["ida-pro-mcp"].url, mcp.URL);
+  assert.equal(fs.existsSync(path.join(fx.home, "AppData", "Cursor", "mcp.json")), false);
   const second = mcp.installClients(fx);
   assert.equal(second.rows.filter((row) => row.changed).length, 0);
 });

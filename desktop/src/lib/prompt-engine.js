@@ -35,6 +35,7 @@ const SEATS = [
   { id: "gemini", tag: "Gemini全模型支持", name: "Gemini", accent: "#ef4348", short: "GEMINI.md 破甲注入", mark: "06" },
   { id: "doubao", tag: "豆包", name: "Doubao", accent: "#c45a3a", short: ".user_skills/cha-doubao", mark: "07" },
   { id: "workbuddy", tag: "WorkBuddy", name: "WorkBuddy", accent: "#8d3a44", short: ".workbuddy/skills/cha-workbuddy", mark: "08" },
+  { id: "cursor", tag: "Cursor", name: "Cursor", accent: "#d7dde6", short: "~/.cursor/rules/cha-cursor.mdc", mark: "09" },
 ];
 
 const CHANNELS = [

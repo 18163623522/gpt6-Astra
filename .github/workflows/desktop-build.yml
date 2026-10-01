@@ -62,11 +62,49 @@ jobs:
         run: npm ci
       - name: Build desktop package
         working-directory: desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
         run: npm run ${{ matrix.script }}
       - name: Upload ${{ matrix.name }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: desktop/dist/*
+          path: |
+            desktop/dist/*.exe
+            desktop/dist/*.dmg
+            desktop/dist/*.zip
+            desktop/dist/*.AppImage
+            desktop/dist/*.deb
           if-no-files-found: error
           retention-days: 14
+
+  release:
+    name: Publish Windows, macOS and Linux
+    needs: package
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*"
+          path: release-assets
+          merge-multiple: false
+      - name: Collect installers
+        run: |
+          mkdir -p out
+          find release-assets -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.zip' -o -name '*.AppImage' -o -name '*.deb' \) -exec cp -t out {} +
+          ls -la out
+          test "$(find out -type f | wc -l)" -ge 4
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes=$'冷咖啡破甲工作台 3.1.0-preview.1\n\n- Windows：免安装 portable exe\n- macOS：dmg 和 zip。第一次若被系统拦住，在图标上右键打开。\n- Linux：AppImage 和 deb\n\nKey 在 https://coldcoffeeai.com/ 购买。打开软件后单独发送「冷咖啡」。'
+          if gh release view "v3.1.0-preview.1" >/dev/null 2>&1; then
+            gh release upload "v3.1.0-preview.1" out/* --clobber
+          else
+            gh release create "v3.1.0-preview.1" out/* --title "3.1.0-preview.1" --notes "$notes" --latest
+          fi

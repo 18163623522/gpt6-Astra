@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const { renderPack, renderRouteSkill, renderLeafSkill, leafIds, markers, seatMeta, PACK_IDS, ROUTE_IDS, APP_TITLE } = require("./seat-packs");
+const { cursorConfigDir, assertCursorUserDir } = require("./cursor-home");
 
 function homeOf(envKeys, folder) {
   for (const key of envKeys) {
@@ -121,6 +122,7 @@ function seatHomes() {
     gemini: homeOf(["GEMINI_HOME", "GEMINI_DIR"], ".gemini"),
     doubao: doubaoSkillsHome(),
     workbuddy: realpathOrSelf(homeOf(["WORKBUDDY_HOME"], ".workbuddy")),
+    cursor: cursorConfigDir(),
   };
 }
 
@@ -132,6 +134,19 @@ function doubaoSkillsHome({ env = process.env, home = os.homedir(), platform = p
 
 function workbuddyLoader(begin, end) {
   return `${begin}\n# 冷咖啡 · WorkBuddy 技能入口\n\n用户输入「冷咖啡」时，读取本目录 skills/cha-workbuddy/SKILL.md，再按该技能继续。\n技能文件是正文。这个入口只负责指到正确文件。\n${end}\n`;
+}
+
+function cursorSkillBody() {
+  return [
+    "---",
+    "name: cha-cursor",
+    "description: 冷咖啡 Cursor 常驻破甲。正文在用户目录 rules/cha-cursor.mdc，alwaysApply 为 true。",
+    "---",
+    "",
+    "用户输入「冷咖啡」时，读取同级用户目录 rules/cha-cursor.mdc，并按该规则继续。",
+    "这份技能只是入口。Cursor 每轮注入的是 rules 里的 .mdc，不是安装目录，也不是 AppData。",
+    "",
+  ].join("\n");
 }
 
 function extraHomes(overrideHome) {
@@ -246,6 +261,20 @@ function plan(seatId, overrideHome) {
       writes: [
         { kind: "marked", file: path.join(home, "AGENTS.md"), begin, end, body: workbuddyLoader(begin, end) },
         { kind: "file", file: path.join(home, "skills", "cha-workbuddy", "SKILL.md"), mode: "replace" },
+      ],
+      begin,
+      end,
+      pack,
+      meta,
+    };
+  }
+  if (seatId === "cursor") {
+    const cursorRoot = assertCursorUserDir(home);
+    return {
+      home: cursorRoot,
+      writes: [
+        { kind: "file", file: path.join(cursorRoot, "rules", "cha-cursor.mdc"), mode: "replace" },
+        { kind: "skill", file: path.join(cursorRoot, "skills", "cha-cursor", "SKILL.md"), body: cursorSkillBody() },
       ],
       begin,
       end,

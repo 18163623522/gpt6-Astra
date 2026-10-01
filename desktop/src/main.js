@@ -10,6 +10,7 @@ const seatTransactions = new SeatTransactions();
 const { ActivationGate } = require("./lib/activation-gate");
 const activationGate = new ActivationGate();
 const { detectDirectory } = require("./lib/detect-directory");
+const beginner = require("./lib/beginner-install");
 const idaToolbox = require("./lib/ida-toolbox");
 const idaMcp = require("./lib/ida-mcp");
 const { WorkflowEngine, planWorkflow, healthCheckTools } = require("./lib/workflow");
@@ -236,6 +237,31 @@ handleTrusted("coldbrew:toolbox", async (_event, payload = {}) => {
     return idaMcp.installPlugin({ pluginSource: source });
   }
   throw new Error("未知工具箱操作");
+});
+
+handleTrusted("coldbrew:beginner", async (_event, action, payload = {}) => {
+  if (action === "scan") {
+    const links = beginner.collectShortcuts();
+    return beginner.scanAll().map((row) => ({ ...row, launchers: row.ok ? beginner.launchersFrom(row.seat, links) : [] }));
+  }
+  if (action === "install") return beginner.installOne(String(payload.seat || ""), { confirm: payload.confirm === true });
+  if (action === "uninstall") return beginner.uninstallOne(String(payload.seat || ""), { confirm: payload.confirm === true });
+  if (action === "open") {
+    const seat = String(payload.seat || "");
+    const hit = beginner.matchLauncher(seat, payload.path);
+    let toolbox = { code: "skip" };
+    try {
+      const { detectDirectory } = require("./lib/detect-directory");
+      const found = detectDirectory(seat);
+      toolbox = require("./lib/ida-mcp").attachSeat(seat, { root: found.root, layout: found.layout || "default" });
+    } catch (error) {
+      toolbox = { code: "skip", skipped: error.message };
+    }
+    const opened = await shell.openPath(hit.path);
+    if (opened) throw new Error(opened);
+    return { ok: true, name: hit.name, toolbox: toolbox.code || "skip" };
+  }
+  throw new Error("未知小白操作");
 });
 
 handleTrusted("coldbrew:open-docs", async () => {

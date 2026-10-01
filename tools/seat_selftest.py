@@ -13,9 +13,9 @@ sys.path.insert(0, str(ROOT))
 from seats import PACK_IDS, activation_reply, deploy, preview, render_pack, restore, verify  # noqa: E402
 
 STAMPS = {seat: "统一工单" for seat in (
-    "codex", "claude", "grok", "deepseek", "glm53", "gemini", "doubao", "workbuddy",
+    "codex", "claude", "grok", "deepseek", "glm53", "gemini", "doubao", "workbuddy", "cursor",
 )}
-ROUTED = {"codex", "claude", "grok", "deepseek", "glm53", "gemini"}
+ROUTED = {"codex", "claude", "grok", "deepseek", "glm53", "gemini", "cursor"}
 
 
 def main() -> int:
@@ -42,6 +42,7 @@ def main() -> int:
         "gemini": "执行核三拍",
         "doubao": "落点三拍",
         "workbuddy": "入席三拍",
+        "cursor": "常驻三拍",
     }
     for seat, body in bodies.items():
         for mark in ("第一步", "第二步", "第三步"):
@@ -67,13 +68,23 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="cha-seats-") as raw:
         root = Path(raw)
         for seat in PACK_IDS:
-            home = root / seat
+            home = root / ".cursor" if seat == "cursor" else root / seat
             pre = preview(seat, home)
             if not pre.get("ok"):
                 raise SystemExit(f"{seat} preview failed")
             dep = deploy(seat, home)
             if not dep.get("ok"):
                 raise SystemExit(f"{seat} deploy failed")
+            if seat == "cursor":
+                rule = (home / "rules" / "cha-cursor.mdc").read_text(encoding="utf-8")
+                if not rule.startswith("---\n") or "alwaysApply: true" not in rule:
+                    raise SystemExit("cursor rule frontmatter is wrong")
+                if rule.index("alwaysApply: true") > rule.index("<!-- CHA-CURSOR-POJIA:BEGIN -->"):
+                    raise SystemExit("cursor frontmatter is not first")
+                if not (home / "skills" / "cha-cursor" / "SKILL.md").is_file():
+                    raise SystemExit("cursor skill missing")
+                if (home / "AGENTS.md").exists():
+                    raise SystemExit("cursor must not write AGENTS.md")
             ver = verify(seat, home)
             if not ver.get("ok"):
                 raise SystemExit(f"{seat} verify failed: {ver}")

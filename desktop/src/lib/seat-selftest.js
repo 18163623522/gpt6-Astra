@@ -18,8 +18,9 @@ function main() {
     gemini: "统一工单",
     doubao: "统一工单",
     workbuddy: "统一工单",
+    cursor: "统一工单",
   };
-  const routed = new Set(["codex", "claude", "grok", "deepseek", "glm53", "gemini"]);
+  const routed = new Set(["codex", "claude", "grok", "deepseek", "glm53", "gemini", "cursor"]);
   const rendered = {};
   for (const id of PACK_IDS) {
     rendered[id] = renderPack(id);
@@ -48,6 +49,7 @@ function main() {
     gemini: "执行核三拍",
     doubao: "落点三拍",
     workbuddy: "入席三拍",
+    cursor: "常驻三拍",
   };
   for (const id of PACK_IDS) {
     assert(rendered[id].includes("第一步"), `${id} missing step 1`);
@@ -77,11 +79,21 @@ function main() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "cha-seats-"));
   try {
     for (const id of PACK_IDS) {
-      const home = path.join(root, id);
+      const home = id === "cursor" ? path.join(root, ".cursor") : path.join(root, id);
       const pre = runtime.preview(id, home);
       assert(pre.ok && pre.text, `${id} preview failed`);
       const dep = runtime.deploy(id, home);
       assert(dep.ok && dep.writes.length, `${id} deploy failed`);
+      if (id === "cursor") {
+        const rule = fs.readFileSync(path.join(home, "rules", "cha-cursor.mdc"), "utf8");
+        assert(rule.startsWith("---\n"), "cursor rule must start with frontmatter");
+        assert(rule.includes("alwaysApply: true"), "cursor rule must alwaysApply");
+        assert(rule.indexOf("alwaysApply: true") < rule.indexOf("<!-- CHA-CURSOR-POJIA:BEGIN -->"), "frontmatter must precede the marker");
+        assert(fs.existsSync(path.join(home, "skills", "cha-cursor", "SKILL.md")), "cursor skill missing");
+        assert(!fs.existsSync(path.join(home, "AGENTS.md")), "cursor must not write AGENTS.md");
+        const writes = dep.writes.map((file) => file.replace(/\\/g, "/"));
+        assert(writes.every((file) => !file.includes("/skills-cursor/")), "cursor must not write skills-cursor");
+      }
       const ver = runtime.verify(id, home);
       assert(ver.ok, `${id} verify failed: ${JSON.stringify(ver.checks)}`);
       const res = runtime.restore(id, home);
