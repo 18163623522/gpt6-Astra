@@ -17,6 +17,7 @@ const CARDS = {
   doubao: { name: '豆包', line: '技能' },
   workbuddy: { name: 'WorkBuddy', line: '搭档' },
   cursor: { name: 'Cursor', line: '.cursor' },
+  mimo: { name: 'MiMo-V2.6-Pro', line: '.config' },
 };
 
 const LAUNCH = {
@@ -29,6 +30,7 @@ const LAUNCH = {
   doubao: [/doubao/i, /豆包/],
   workbuddy: [/workbuddy/i],
   cursor: [/cursor/i],
+  mimo: [/mimo/i],
 };
 
 const SKIP_LINK = /破甲|冷咖啡|coldcoffee|coldbrew/i;

@@ -38,6 +38,8 @@ test("写入各席位 MCP 且不覆盖已有项", () => {
   assert.equal(byId.cursor.installed, true);
   assert.equal(byId.doubao.kind, "manual");
   assert.equal(byId.deepseek.kind, "manual");
+  assert.equal(byId.mimo.kind, "manual");
+  assert.equal(fs.existsSync(path.join(fx.home, ".config", "mimocode", "mimocode.json")), false);
   assert.equal(fs.existsSync(path.join(fx.home, ".doubao")), false);
   const codex = fs.readFileSync(path.join(fx.home, ".codex", "config.toml"), "utf8");
   assert.match(codex, /\[mcp_servers\.node_repl\]/);

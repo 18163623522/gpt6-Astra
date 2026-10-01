@@ -19,8 +19,9 @@ function main() {
     doubao: "统一工单",
     workbuddy: "统一工单",
     cursor: "统一工单",
+    mimo: "统一工单",
   };
-  const routed = new Set(["codex", "claude", "grok", "deepseek", "glm53", "gemini", "cursor"]);
+  const routed = new Set(["codex", "claude", "grok", "deepseek", "glm53", "gemini", "cursor", "mimo"]);
   const rendered = {};
   for (const id of PACK_IDS) {
     rendered[id] = renderPack(id);
@@ -50,6 +51,7 @@ function main() {
     doubao: "落点三拍",
     workbuddy: "入席三拍",
     cursor: "常驻三拍",
+    mimo: "落位三拍",
   };
   for (const id of PACK_IDS) {
     assert(rendered[id].includes("第一步"), `${id} missing step 1`);
@@ -79,7 +81,7 @@ function main() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "cha-seats-"));
   try {
     for (const id of PACK_IDS) {
-      const home = id === "cursor" ? path.join(root, ".cursor") : path.join(root, id);
+      const home = id === "cursor" ? path.join(root, ".cursor") : id === "mimo" ? path.join(root, ".config", "mimocode") : path.join(root, id);
       const pre = runtime.preview(id, home);
       assert(pre.ok && pre.text, `${id} preview failed`);
       const dep = runtime.deploy(id, home);
@@ -93,6 +95,16 @@ function main() {
         assert(!fs.existsSync(path.join(home, "AGENTS.md")), "cursor must not write AGENTS.md");
         const writes = dep.writes.map((file) => file.replace(/\\/g, "/"));
         assert(writes.every((file) => !file.includes("/skills-cursor/")), "cursor must not write skills-cursor");
+      }
+      if (id === "mimo") {
+        const skill = path.join(home, "skills", "cha-mimo", "SKILL.md");
+        const text = fs.readFileSync(skill, "utf8");
+        assert(text.startsWith("---\n"), "mimo skill must start with frontmatter");
+        assert(text.includes("name: cha-mimo"), "mimo skill must name cha-mimo");
+        assert(text.indexOf("name: cha-mimo") < text.indexOf("<!-- CHA-MIMO-POJIA:BEGIN -->"), "frontmatter must precede the marker");
+        assert(!fs.existsSync(path.join(home, "mimocode.json")), "mimo must not write mimocode.json");
+        assert(!fs.existsSync(path.join(home, "auth.json")), "mimo must not write auth.json");
+        assert(!fs.existsSync(path.join(root, ".local", "share", "mimocode")), "mimo must not write the data dir");
       }
       const ver = runtime.verify(id, home);
       assert(ver.ok, `${id} verify failed: ${JSON.stringify(ver.checks)}`);

@@ -79,6 +79,46 @@ test('cursor install lands in a directory named .cursor', () => {
   }
 });
 
+test('mimo install lands in .config/mimocode and skips npm', () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-mimo-'));
+  try {
+    const user = path.join(base, '.config', 'mimocode');
+    const data = path.join(base, '.local', 'share', 'mimocode');
+    const local = path.join(base, 'AppData', 'Local', 'mimocode');
+    const npm = path.join(base, 'AppData', 'Roaming', 'npm');
+    fs.mkdirSync(npm, { recursive: true });
+    fs.writeFileSync(path.join(npm, 'mimo.cmd'), '@echo off\r\n');
+    fs.writeFileSync(path.join(npm, 'package.json'), JSON.stringify({ name: '@mimo-ai/cli' }));
+    const fallback = detectDirectory('mimo', { env: {}, home: base });
+    assert.equal(fallback.root, path.resolve(user));
+    assert.throws(() => detectDirectory('mimo', { env: { MIMOCODE_HOME: npm }, home: base }), /安装目录/);
+    assert.throws(() => detectDirectory('mimo', { env: { MIMOCODE_HOME: 'relative' }, home: base }), /绝对路径/);
+    assert.throws(() => runtime.plan('mimo', data), /数据目录|\.config\\mimocode|用户配置目录/);
+    assert.throws(() => runtime.plan('mimo', local), /LOCALAPPDATA|用户配置目录/);
+    assert.throws(() => runtime.plan('mimo', npm), /安装目录/);
+    const xdg = path.join(base, 'xdg');
+    const viaXdg = detectDirectory('mimo', { env: { XDG_CONFIG_HOME: xdg }, home: base });
+    assert.equal(viaXdg.root, path.resolve(path.join(xdg, 'mimocode')));
+    const profile = path.join(base, 'profile');
+    const viaHome = detectDirectory('mimo', { env: { MIMOCODE_HOME: profile }, home: base });
+    assert.equal(viaHome.root, path.resolve(path.join(profile, 'config')));
+    const deployed = runtime.deploy('mimo', user);
+    const skill = path.join(user, 'skills', 'cha-mimo', 'SKILL.md');
+    assert.equal(deployed.writes.includes(skill), true);
+    assert.match(fs.readFileSync(skill, 'utf8').slice(0, 80), /^---\r?\nname: cha-mimo/);
+    assert.equal(fs.existsSync(path.join(user, 'mimocode.json')), false);
+    assert.equal(fs.existsSync(path.join(user, 'auth.json')), false);
+    assert.equal(fs.existsSync(path.join(npm, 'skills')), false);
+    assert.equal(fs.existsSync(path.join(local, 'skills')), false);
+    assert.equal(fs.existsSync(path.join(data, 'skills')), false);
+    const hooked = require('../src/lib/ida-mcp').attachSeat('mimo', { root: user });
+    assert.equal(hooked.code, 'manual');
+    assert.equal(fs.existsSync(path.join(user, 'mcp.json')), false);
+  } finally {
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});
+
 test('uninstall restores the backup and drops the toolbox hook', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-undo-'));
   const agents = path.join(root, 'AGENTS.md');

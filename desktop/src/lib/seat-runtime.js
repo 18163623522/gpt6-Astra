@@ -3,6 +3,7 @@ const os = require("node:os");
 const path = require("node:path");
 const { renderPack, renderRouteSkill, renderLeafSkill, leafIds, markers, seatMeta, PACK_IDS, ROUTE_IDS, APP_TITLE } = require("./seat-packs");
 const { cursorConfigDir, assertCursorUserDir } = require("./cursor-home");
+const { mimoConfigDir, assertMimoUserDir } = require("./mimo-home");
 
 function homeOf(envKeys, folder) {
   for (const key of envKeys) {
@@ -123,6 +124,7 @@ function seatHomes() {
     doubao: doubaoSkillsHome(),
     workbuddy: realpathOrSelf(homeOf(["WORKBUDDY_HOME"], ".workbuddy")),
     cursor: cursorConfigDir(),
+    mimo: mimoConfigDir(),
   };
 }
 
@@ -275,6 +277,19 @@ function plan(seatId, overrideHome) {
       writes: [
         { kind: "file", file: path.join(cursorRoot, "rules", "cha-cursor.mdc"), mode: "replace" },
         { kind: "skill", file: path.join(cursorRoot, "skills", "cha-cursor", "SKILL.md"), body: cursorSkillBody() },
+      ],
+      begin,
+      end,
+      pack,
+      meta,
+    };
+  }
+  if (seatId === "mimo") {
+    const mimoRoot = assertMimoUserDir(home);
+    return {
+      home: mimoRoot,
+      writes: [
+        { kind: "file", file: path.join(mimoRoot, "skills", "cha-mimo", "SKILL.md"), mode: "replace" },
       ],
       begin,
       end,

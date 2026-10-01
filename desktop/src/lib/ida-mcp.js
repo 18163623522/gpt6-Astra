@@ -237,6 +237,7 @@ function clients(options = {}) {
     { id: "doubao", label: "豆包", kind: "manual", note: "豆包没有 mcp.json。连接器里选 HTTP，地址用下面这一条" },
     { id: "workbuddy", label: "WorkBuddy", kind: "json", file: path.join(buddy, "mcp.json"), keys: ["mcpServers", SERVER], entry: { type: "streamableHttp", url: URL, timeout: 30000 }, create: true },
     { id: "cursor", label: "Cursor", kind: "json", file: path.join(home, ".cursor", "mcp.json"), keys: ["mcpServers", SERVER], entry: { url: URL }, create: true },
+    { id: "mimo", label: "MiMo-V2.6-Pro", kind: "manual", note: "技能写在用户配置目录 skills/cha-mimo/SKILL.md。不改 mimocode.json，避免动到模型和 Key" },
   ];
 }
 

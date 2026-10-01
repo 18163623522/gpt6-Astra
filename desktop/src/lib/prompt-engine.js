@@ -36,6 +36,7 @@ const SEATS = [
   { id: "doubao", tag: "豆包", name: "Doubao", accent: "#c45a3a", short: ".user_skills/cha-doubao", mark: "07" },
   { id: "workbuddy", tag: "WorkBuddy", name: "WorkBuddy", accent: "#8d3a44", short: ".workbuddy/skills/cha-workbuddy", mark: "08" },
   { id: "cursor", tag: "Cursor", name: "Cursor", accent: "#d7dde6", short: "~/.cursor/rules/cha-cursor.mdc", mark: "09" },
+  { id: "mimo", tag: "MiMo-V2.6-Pro", name: "MiMo", accent: "#ff7a1a", short: "~/.config/mimocode/skills/cha-mimo", mark: "10" },
 ];
 
 const CHANNELS = [
