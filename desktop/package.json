@@ -94,6 +94,8 @@
     },
     "linux": {
       "icon": "assets/icon-v4.png",
+      "executableName": "coldbrew-zero",
+      "artifactName": "coldbrew-zero-${version}-linux-${arch}.${ext}",
       "category": "Development",
       "target": [
         "AppImage",
