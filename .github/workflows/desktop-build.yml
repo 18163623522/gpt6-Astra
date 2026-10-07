@@ -112,8 +112,10 @@ jobs:
             echo "no installers" >&2
             exit 1
           fi
-          if gh release view "v3.1.0-preview.1" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "v3.1.0-preview.1" "${files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
+          version="$(tr -d '\r\n' < VERSION)"
+          tag="v${version}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" "${files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
           else
-            gh release create "v3.1.0-preview.1" "${files[@]}" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "3.1.0-preview.1" --notes-file docs/release-notes-3.1.0-preview.1.txt --latest
+            gh release create "$tag" "${files[@]}" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$version" --prerelease --notes "Windows, macOS arm64, and Linux packages for ${version}."
           fi

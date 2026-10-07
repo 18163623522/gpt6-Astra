@@ -5,7 +5,7 @@
   <p><strong>十一个软件 · 一键破甲 · 一键卸载</strong></p>
   <p>打勾，按一下。打开软件后发「冷咖啡」。不想要了，按卸载，文件回到写入之前。</p>
   <p><a href="#下载">下载</a> · <a href="#上手使用">上手使用</a> · <a href="#十一个软件">十一个软件</a> · <a href="#四页">四页</a> · <a href="#冷咖啡中转">冷咖啡中转</a> · <a href="#工具箱">工具箱</a> · <a href="#冷咖啡社群">三个 QQ 群</a></p>
-  <p><sub>3.1.0-preview.3 · Windows 十一个软件 · <a href="https://coldcoffeeai.com/">coldcoffeeai.com</a></sub></p>
+  <p><sub>3.1.0-preview.3 · 三个系统 · 十一个软件 · <a href="https://coldcoffeeai.com/">coldcoffeeai.com</a></sub></p>
 </div>
 
 <blockquote>
@@ -19,12 +19,12 @@
 </blockquote>
 
 <h2 id="下载">下载</h2>
-<p>先看版本，再下包。Windows 这一包和主页这张表是同一套：十一个软件，含 Kimi K3，金色条是闭源和定制。macOS、Linux 公开包还是上一版，席位对不上这张表。</p>
+<p>三个系统都是 3.1.0-preview.3，和下面这张席位表是同一套：十一个软件，含 Kimi K3。金色条是闭源和定制。macOS 这一包是 Apple 芯片 arm64。</p>
 <table>
 <tr><th align="left">系统</th><th align="left">版本</th><th align="left">席位</th><th align="left">安装包</th></tr>
 <tr><td><strong>Windows</strong></td><td><code>3.1.0-preview.3</code></td><td>十一个，含 Kimi K3</td><td><a href="https://github.com/3641397194-wq/gpt6-Astra/releases/download/v3.1.0-preview.3/ColdCoffee-Workbench-Windows-3.1.0-preview.3.exe">免安装 .exe ↗</a></td></tr>
-<tr><td><strong>macOS</strong></td><td><code>3.1.0-preview.1</code></td><td>上一版</td><td><a href="https://github.com/3641397194-wq/gpt6-Astra/releases/tag/v3.1.0-preview.1">.dmg / .zip ↗</a></td></tr>
-<tr><td><strong>Linux</strong></td><td><code>3.1.0-preview.1</code></td><td>上一版</td><td><a href="https://github.com/3641397194-wq/gpt6-Astra/releases/tag/v3.1.0-preview.1">.AppImage / .deb ↗</a></td></tr>
+<tr><td><strong>macOS</strong></td><td><code>3.1.0-preview.3</code></td><td>十一个，含 Kimi K3，Apple 芯片 arm64</td><td><a href="https://github.com/3641397194-wq/gpt6-Astra/releases/download/v3.1.0-preview.3/ColdCoffee-Workbench-macOS-arm64-3.1.0-preview.3.dmg">.dmg ↗</a> · <a href="https://github.com/3641397194-wq/gpt6-Astra/releases/download/v3.1.0-preview.3/ColdCoffee-Workbench-macOS-arm64-3.1.0-preview.3.zip">.zip ↗</a></td></tr>
+<tr><td><strong>Linux</strong></td><td><code>3.1.0-preview.3</code></td><td>十一个，含 Kimi K3，x86_64</td><td><a href="https://github.com/3641397194-wq/gpt6-Astra/releases/download/v3.1.0-preview.3/coldbrew-zero-3.1.0-preview.3-linux-x86_64.AppImage">.AppImage ↗</a> · <a href="https://github.com/3641397194-wq/gpt6-Astra/releases/download/v3.1.0-preview.3/coldbrew-zero-3.1.0-preview.3-linux-amd64.deb">.deb ↗</a></td></tr>
 </table>
 <p>Windows 双击打开。macOS 第一次若被拦住，在程序图标上右键，选打开。Linux 的 AppImage 先加上可执行权限。deb 用系统的安装器。</p>
 <pre><code>cd desktop
@@ -37,7 +37,7 @@ npm run pack:linux  # Linux AppImage + DEB</code></pre>
 
 <h2 id="上手使用">上手使用</h2>
 <ol>
-<li><strong>打开软件：</strong>Windows 用 3.1.0-preview.3。macOS 和 Linux 公开包仍是 3.1.0-preview.1。</li>
+<li><strong>打开软件：</strong>Windows、macOS、Linux 都用 3.1.0-preview.3。macOS 这一包是 Apple 芯片。</li>
 <li><strong>一键破甲：</strong>只勾你要写的软件，按一下。写入之前会先备份。只改勾上的软件。</li>
 <li><strong>发送口令：</strong>打开那个软件，对话框里单独发「冷咖啡」。不想要了，回到这里按一键卸载，文件回到写入之前。</li>
 </ol>
