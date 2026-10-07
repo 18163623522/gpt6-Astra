@@ -2,9 +2,9 @@
   <img src="docs/assets/coldcoffee-cover-v5-c18118b1aed9.jpg" width="100%" alt="冷咖啡黑白漫画主视觉，夜班吧台和一杯冰美式" />
   <h1>冷咖啡 · 破甲工作台</h1>
   <p><a href="https://github.com/3641397194-wq/gpt6-Astra/blob/main/%E5%86%B7%E5%92%96%E5%95%A1.mp4"><strong>冷咖啡.mp4 · 点这里看视频</strong></a></p>
-  <p><strong>九个软件 · 一键破甲 · 一键卸载 · Windows / macOS / Linux</strong></p>
+  <p><strong>十个软件 · 一键破甲 · 一键卸载</strong></p>
   <p>打勾，按一下。打开软件后发「冷咖啡」。不想要了，按卸载，文件回到写入之前。</p>
-  <p><a href="#软件界面">软件界面</a> · <a href="#下载">下载</a> · <a href="#上手使用">上手使用</a> · <a href="#九个软件">九个软件</a> · <a href="#冷咖啡中转">冷咖啡中转</a> · <a href="#工具箱">工具箱</a> · <a href="#冷咖啡社群">三个 QQ 群</a></p>
+  <p><a href="#下载">下载</a> · <a href="#上手使用">上手使用</a> · <a href="#十个软件">十个软件</a> · <a href="#四页">四页</a> · <a href="#冷咖啡中转">冷咖啡中转</a> · <a href="#工具箱">工具箱</a> · <a href="#冷咖啡社群">三个 QQ 群</a></p>
   <p><sub>3.1.0-preview.2 · <a href="https://coldcoffeeai.com/">coldcoffeeai.com</a></sub></p>
 </div>
 
@@ -13,25 +13,13 @@
 <p>勾上要写的软件，按一键破甲。打开那个软件，单独发送「冷咖啡」。Key 在 <a href="https://coldcoffeeai.com/">coldcoffeeai.com</a> 买，回到软件里贴上。</p>
 </blockquote>
 
-<h2 id="软件界面">软件界面</h2>
-<p>左边四页：一键破甲、冷咖啡中转、冷咖啡社群、工具箱。下面是现在这版界面。</p>
-<p><strong>01 一键破甲</strong> · 打勾，按一下。打开软件后发「冷咖啡」。不想要了，按卸载。</p>
-<img src="docs/assets/ui-home-a2d6aea56fa9.png" width="100%" alt="一键破甲：九个软件、官网和三个 QQ 群" />
-<table>
-<tr>
-<th align="center">02 冷咖啡中转</th>
-<th align="center">03 冷咖啡社群</th>
-</tr>
-<tr>
-<td align="center"><img src="docs/assets/ui-relay-now-803d63eca41f.png" width="100%" alt="冷咖啡中转：地址 coldcoffeeai.com/v1，Key 自己贴" /></td>
-<td align="center"><img src="docs/assets/ui-groups-now-9bccc78be706.png" width="100%" alt="三个 QQ 群：1057540028、1077074552、618179023" /></td>
-</tr>
-</table>
-<p><strong>04 工具箱</strong> · IDA 中文界面，以及本机 127.0.0.1:13337 的 IDA 连接。扫描器和利用工具不装进这台机器。</p>
-<img src="docs/assets/ui-tools-now-96c0f39b98ac.png" width="100%" alt="工具箱：IDA 中文界面和 IDA MCP" />
+<blockquote>
+<p><strong>需要闭源破甲，或者定制破甲，进 QQ 群找管理。</strong></p>
+<p>开源破甲在软件里自己勾上安装。闭源破甲和定制破甲不在这个仓库开通。一群 <code>1057540028</code>、二群 <code>1077074552</code>、三群 <code>618179023</code>。</p>
+</blockquote>
 
 <h2 id="下载">下载</h2>
-<p>Windows 免安装包是现在这版工作台，和桌面上打开的是同一份界面。macOS、Linux 还停在上一版。</p>
+<p>Windows 免安装包是现在这版工作台：十个软件，金色条是闭源和定制。macOS、Linux 还停在上一版，界面和席位没有这一次的更新。</p>
 <table>
 <tr><th align="left">系统</th><th align="left">安装包</th><th align="left">拿到之后</th></tr>
 <tr><td><strong>Windows</strong></td><td>免安装 portable <code>.exe</code></td><td>双击打开。</td></tr>
@@ -49,13 +37,13 @@ npm run pack:linux  # Linux AppImage + DEB</code></pre>
 
 <h2 id="上手使用">上手使用</h2>
 <ol>
-<li><strong>打开软件：</strong>上面下载你的系统。Windows、macOS、Linux 都是这一套界面。</li>
+<li><strong>打开软件：</strong>Windows 下这一版。macOS 和 Linux 先用上一版安装包。</li>
 <li><strong>一键破甲：</strong>只勾你要写的软件，按一下。写入之前会先备份。只改勾上的软件。</li>
 <li><strong>发送口令：</strong>打开那个软件，对话框里单独发「冷咖啡」。不想要了，回到这里按一键卸载，文件回到写入之前。</li>
 </ol>
 
-<h2 id="九个软件">九个软件</h2>
-<p>软件自己认目录。Windows 用用户主目录；macOS 和 Linux 用家目录下的同名隐藏目录。只写勾上的那一个。</p>
+<h2 id="十个软件">十个软件</h2>
+<p>左边四页里的「一键破甲」一次能勾多个。软件自己认目录。只写勾上的那些。</p>
 <table>
 <tr><th align="left">软件</th><th align="left">Windows</th><th align="left">macOS / Linux</th></tr>
 <tr><td>GPT-6 Astra全模型支持</td><td><code>%USERPROFILE%\.codex</code></td><td><code>~/.codex</code></td></tr>
@@ -67,8 +55,19 @@ npm run pack:linux  # Linux AppImage + DEB</code></pre>
 <tr><td>豆包</td><td><code>%LOCALAPPDATA%\Doubao\User Data\Default\.doubao\agent_mode\workspace\.user_skills</code></td><td>macOS 在 <code>~/Library/Application Support/Doubao/...</code> 的同一层用户技能目录。Linux 在 <code>~/.local/share/Doubao/...</code>。不写软件自带的 <code>.skills</code>。</td></tr>
 <tr><td>WorkBuddy</td><td><code>%USERPROFILE%\.workbuddy</code></td><td><code>~/.workbuddy</code></td></tr>
 <tr><td>Cursor</td><td><code>%USERPROFILE%\.cursor</code></td><td><code>~/.cursor</code></td></tr>
+<tr><td>MiMo-V2.6-Pro</td><td><code>%USERPROFILE%\.config\mimocode</code></td><td><code>~/.config/mimocode</code></td></tr>
 </table>
+<p>MiMo 只写用户配置目录里的 <code>skills/cha-mimo/SKILL.md</code>。不写 npm 安装目录，不写 <code>auth.json</code>，不写 <code>mimocode.json</code>。</p>
 <p>Cursor 只写用户目录里的 <code>rules/cha-cursor.mdc</code> 和 <code>skills/cha-cursor/SKILL.md</code>。规则文件开头是 YAML，里面有 <code>alwaysApply: true</code>。不写安装目录，不写 <code>%APPDATA%\Cursor</code>，不写 <code>skills-cursor</code>。<code>CURSOR_HOME</code> 只有在目录名仍是 <code>.cursor</code> 时才用。</p>
+
+<h2 id="四页">四页</h2>
+<table>
+<tr><th align="left">页</th><th align="left">做什么</th></tr>
+<tr><td><strong>01 一键破甲</strong></td><td>十个软件打勾，按一下。写入前先备份。卸载把勾上的文件退回备份。</td></tr>
+<tr><td><strong>02 冷咖啡中转</strong></td><td>地址 <code>https://coldcoffeeai.com/v1</code>。Key 自己贴，只留在这台电脑。</td></tr>
+<tr><td><strong>03 冷咖啡社群</strong></td><td>需要闭源破甲，或者定制破甲，进群找管理。用法和售后也在这里。</td></tr>
+<tr><td><strong>04 工具箱</strong></td><td>IDA 简体中文，以及本机 <code>127.0.0.1:13337</code>。不装扫描器，不装利用工具。</td></tr>
+</table>
 
 <h2 id="冷咖啡中转">冷咖啡中转</h2>
 <p>地址不用改。Key 在官网买，贴进软件里。Key 只留在这台电脑上，不进这个仓库。</p>
@@ -92,9 +91,9 @@ npm run pack:linux  # Linux AppImage + DEB</code></pre>
 <p>一键破甲时，能写配置的软件会带上本机 IDA 连接 <code>http://127.0.0.1:13337/mcp</code>。IDA 没开着，就按软件里的说明自己挂。这里不装扫描器，也不装利用工具。</p>
 
 <h2 id="冷咖啡社群">冷咖啡社群</h2>
-<p>用法和售后进群。买 Key 去 <a href="https://coldcoffeeai.com/">coldcoffeeai.com</a>。要额外定制，进群里说。</p>
+<p>需要闭源破甲，或者定制破甲，进下面三个群找管理。Key 去 <a href="https://coldcoffeeai.com/">coldcoffeeai.com</a> 买。用法和售后也在群里问。</p>
 <table>
-<tr><th>QQ 交流群</th><th>QQ 专题群</th><th>Cool coffeeAI 交流</th></tr>
+<tr><th>一群</th><th>二群</th><th>三群</th></tr>
 <tr><td align="center"><a href="docs/assets/qq-group-1-card.png"><img src="docs/assets/qq-group-1-card.png" width="220" alt="QQ 交流群二维码" /></a></td><td align="center"><a href="docs/assets/qq-group-2-card.png"><img src="docs/assets/qq-group-2-card.png" width="220" alt="QQ 专题群二维码" /></a></td><td align="center"><a href="docs/assets/qq-group-3-card.png"><img src="docs/assets/qq-group-3-card.png" width="220" alt="Cool coffeeAI 交流群二维码" /></a></td></tr>
 <tr><td align="center"><code>1057540028</code></td><td align="center"><code>1077074552</code></td><td align="center"><code>618179023</code></td></tr>
 </table>
