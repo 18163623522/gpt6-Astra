@@ -119,6 +119,56 @@ test('mimo install lands in .config/mimocode and skips npm', () => {
   }
 });
 
+test('kimi k3 install lands in .kimi-code skills and skips config', () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-kimi-'));
+  try {
+    const user = path.join(base, '.kimi-code');
+    const agents = path.join(base, '.agents', 'skills');
+    const legacy = path.join(base, '.kimi');
+    const project = path.join(base, 'repo');
+    const npm = path.join(base, 'AppData', 'Roaming', 'npm');
+    fs.mkdirSync(project, { recursive: true });
+    fs.mkdirSync(path.join(project, '.git'), { recursive: true });
+    fs.mkdirSync(npm, { recursive: true });
+    fs.writeFileSync(path.join(npm, 'kimi.cmd'), '@echo off\r\n');
+    fs.writeFileSync(path.join(project, '.kimi-code'), '');
+    const fallback = detectDirectory('kimi', { env: {}, home: base });
+    assert.equal(fallback.root, path.resolve(user));
+    assert.equal(fallback.source, 'Kimi Code 数据根');
+    assert.throws(() => detectDirectory('kimi', { env: { KIMI_CODE_HOME: npm }, home: base }), /安装目录/);
+    assert.throws(() => detectDirectory('kimi', { env: { KIMI_CODE_HOME: 'relative' }, home: base }), /绝对路径/);
+    assert.throws(() => detectDirectory('kimi', { env: { KIMI_CODE_HOME: agents }, home: base }), /agents/);
+    assert.throws(() => detectDirectory('kimi', { env: { KIMI_CODE_HOME: legacy }, home: base }), /\.kimi/);
+    assert.throws(() => runtime.plan('kimi', agents), /agents/);
+    assert.throws(() => runtime.plan('kimi', legacy), /\.kimi/);
+    assert.throws(() => runtime.plan('kimi', path.join(project, '.kimi-code')), /数据根|KIMI_CODE_HOME|\.kimi-code/);
+    const relocated = path.join(base, '.config', 'kimi-code');
+    const viaHome = detectDirectory('kimi', { env: { KIMI_CODE_HOME: relocated }, home: base });
+    assert.equal(viaHome.root, path.resolve(relocated));
+    assert.equal(viaHome.source, 'KIMI_CODE_HOME');
+    const deployed = runtime.deploy('kimi', user);
+    const skill = path.join(user, 'skills', 'cha-kimi', 'SKILL.md');
+    assert.equal(deployed.writes.includes(skill), true);
+    assert.equal(deployed.writes.length, 1);
+    const text = fs.readFileSync(skill, 'utf8');
+    assert.match(text.slice(0, 120), /^---\r?\nname: cha-kimi/);
+    assert.match(text, /description:/);
+    assert.equal(fs.existsSync(path.join(user, 'config.toml')), false);
+    assert.equal(fs.existsSync(path.join(user, 'mcp.json')), false);
+    assert.equal(fs.existsSync(path.join(user, 'credentials')), false);
+    assert.equal(fs.existsSync(path.join(user, 'AGENTS.md')), false);
+    assert.equal(fs.existsSync(agents), false);
+    assert.equal(fs.existsSync(path.join(legacy, 'skills')), false);
+    assert.equal(fs.existsSync(path.join(npm, 'skills')), false);
+    const hooked = require('../src/lib/ida-mcp').attachSeat('kimi', { root: user });
+    assert.equal(hooked.code, 'manual');
+    assert.equal(fs.existsSync(path.join(user, 'mcp.json')), false);
+    assert.equal(fs.existsSync(path.join(user, 'config.toml')), false);
+  } finally {
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});
+
 test('uninstall restores the backup and drops the toolbox hook', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-undo-'));
   const agents = path.join(root, 'AGENTS.md');

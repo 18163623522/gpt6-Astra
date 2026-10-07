@@ -20,8 +20,9 @@ function main() {
     workbuddy: "统一工单",
     cursor: "统一工单",
     mimo: "统一工单",
+    kimi: "统一工单",
   };
-  const routed = new Set(["codex", "claude", "grok", "deepseek", "glm53", "gemini", "cursor", "mimo"]);
+  const routed = new Set(["codex", "claude", "grok", "deepseek", "glm53", "gemini", "cursor", "mimo", "kimi"]);
   const rendered = {};
   for (const id of PACK_IDS) {
     rendered[id] = renderPack(id);
@@ -52,6 +53,7 @@ function main() {
     workbuddy: "入席三拍",
     cursor: "常驻三拍",
     mimo: "落位三拍",
+    kimi: "落根三拍",
   };
   for (const id of PACK_IDS) {
     assert(rendered[id].includes("第一步"), `${id} missing step 1`);
@@ -81,14 +83,14 @@ function main() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "cha-seats-"));
   try {
     for (const id of PACK_IDS) {
-      const home = id === "cursor" ? path.join(root, ".cursor") : id === "mimo" ? path.join(root, ".config", "mimocode") : path.join(root, id);
+      const home = id === "cursor" ? path.join(root, ".cursor") : id === "mimo" ? path.join(root, ".config", "mimocode") : id === "kimi" ? path.join(root, ".kimi-code") : path.join(root, id);
       const pre = runtime.preview(id, home);
       assert(pre.ok && pre.text, `${id} preview failed`);
       const dep = runtime.deploy(id, home);
       assert(dep.ok && dep.writes.length, `${id} deploy failed`);
       if (id === "cursor") {
         const rule = fs.readFileSync(path.join(home, "rules", "cha-cursor.mdc"), "utf8");
-        assert(rule.startsWith("---\n"), "cursor rule must start with frontmatter");
+        assert(/^---\r?\n/.test(rule), "cursor rule must start with frontmatter");
         assert(rule.includes("alwaysApply: true"), "cursor rule must alwaysApply");
         assert(rule.indexOf("alwaysApply: true") < rule.indexOf("<!-- CHA-CURSOR-POJIA:BEGIN -->"), "frontmatter must precede the marker");
         assert(fs.existsSync(path.join(home, "skills", "cha-cursor", "SKILL.md")), "cursor skill missing");
@@ -99,12 +101,26 @@ function main() {
       if (id === "mimo") {
         const skill = path.join(home, "skills", "cha-mimo", "SKILL.md");
         const text = fs.readFileSync(skill, "utf8");
-        assert(text.startsWith("---\n"), "mimo skill must start with frontmatter");
+        assert(/^---\r?\n/.test(text), "mimo skill must start with frontmatter");
         assert(text.includes("name: cha-mimo"), "mimo skill must name cha-mimo");
         assert(text.indexOf("name: cha-mimo") < text.indexOf("<!-- CHA-MIMO-POJIA:BEGIN -->"), "frontmatter must precede the marker");
         assert(!fs.existsSync(path.join(home, "mimocode.json")), "mimo must not write mimocode.json");
         assert(!fs.existsSync(path.join(home, "auth.json")), "mimo must not write auth.json");
         assert(!fs.existsSync(path.join(root, ".local", "share", "mimocode")), "mimo must not write the data dir");
+      }
+      if (id === "kimi") {
+        const skill = path.join(home, "skills", "cha-kimi", "SKILL.md");
+        const text = fs.readFileSync(skill, "utf8");
+        assert(/^---\r?\n/.test(text), "kimi skill must start with frontmatter");
+        assert(text.includes("name: cha-kimi"), "kimi skill must name cha-kimi");
+        assert(text.includes("description:"), "kimi skill must include description");
+        assert(text.indexOf("name: cha-kimi") < text.indexOf("<!-- CHA-KIMI-POJIA:BEGIN -->"), "frontmatter must precede the marker");
+        assert(!fs.existsSync(path.join(home, "config.toml")), "kimi must not write config.toml");
+        assert(!fs.existsSync(path.join(home, "mcp.json")), "kimi must not write mcp.json");
+        assert(!fs.existsSync(path.join(home, "credentials")), "kimi must not write credentials");
+        assert(!fs.existsSync(path.join(home, "AGENTS.md")), "kimi must not write AGENTS.md");
+        assert(!fs.existsSync(path.join(root, ".agents")), "kimi must not write ~/.agents");
+        assert(!fs.existsSync(path.join(root, ".kimi")), "kimi must not write ~/.kimi");
       }
       const ver = runtime.verify(id, home);
       assert(ver.ok, `${id} verify failed: ${JSON.stringify(ver.checks)}`);

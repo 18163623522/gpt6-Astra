@@ -3,7 +3,8 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {guardPath}=require('./seat-transactions');
 const {cursorConfigDir,assertCursorUserDir}=require('./cursor-home');
 const {mimoConfigDir,assertMimoUserDir}=require('./mimo-home');
-const definitions={codex:[['CODEX_HOME','CODEX_DIR'],'.codex'],claude:[['CLAUDE_CONFIG_DIR','CLAUDE_HOME'],'.claude'],grok:[['GROK_HOME','GROK_DIR'],'.grok'],deepseek:[['DSH_HOME'],'.dsh'],glm53:[['GLM_HOME','ZHIPU_HOME'],'.glm'],gemini:[['GEMINI_HOME','GEMINI_DIR'],'.gemini'],doubao:[['DOUBAO_USER_SKILLS'],'.doubao'],workbuddy:[['WORKBUDDY_HOME'],'.workbuddy'],cursor:[['CURSOR_HOME'],'.cursor'],mimo:[['MIMOCODE_HOME','XDG_CONFIG_HOME'],'.config/mimocode']};
+const {kimiCodeHome,assertKimiUserDir}=require('./kimi-home');
+const definitions={codex:[['CODEX_HOME','CODEX_DIR'],'.codex'],claude:[['CLAUDE_CONFIG_DIR','CLAUDE_HOME'],'.claude'],grok:[['GROK_HOME','GROK_DIR'],'.grok'],deepseek:[['DSH_HOME'],'.dsh'],glm53:[['GLM_HOME','ZHIPU_HOME'],'.glm'],gemini:[['GEMINI_HOME','GEMINI_DIR'],'.gemini'],doubao:[['DOUBAO_USER_SKILLS'],'.doubao'],workbuddy:[['WORKBUDDY_HOME'],'.workbuddy'],cursor:[['CURSOR_HOME'],'.cursor'],mimo:[['MIMOCODE_HOME','XDG_CONFIG_HOME'],'.config/mimocode'],kimi:[['KIMI_CODE_HOME'],'.kimi-code']};
 function platformDataHome({env=process.env,home=os.homedir(),platform=process.platform}={}){
  if(platform==='win32')return String(env.LOCALAPPDATA||'').trim()||path.join(home,'AppData','Local');
  if(platform==='darwin')return path.join(home,'Library','Application Support');
@@ -23,6 +24,12 @@ function detectDirectory(seat,{env=process.env,home=os.homedir(),platform=proces
   const xdg=String(env.XDG_CONFIG_HOME||'').trim();
   const target=assertMimoUserDir(mimoConfigDir(env,home),env,home);
   add(target,configured?'MIMOCODE_HOME/config':xdg?'XDG_CONFIG_HOME/mimocode':'MiMo 用户配置目录');
+  return candidates[0];
+ }
+ if(seat==='kimi'){
+  const configured=String(env.KIMI_CODE_HOME||'').trim();
+  const target=assertKimiUserDir(kimiCodeHome(env,home),env,home);
+  add(target,configured?'KIMI_CODE_HOME':'Kimi Code 数据根');
   return candidates[0];
  }
  if(seat==='workbuddy'){

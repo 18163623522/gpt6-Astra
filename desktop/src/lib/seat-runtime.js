@@ -4,6 +4,7 @@ const path = require("node:path");
 const { renderPack, renderRouteSkill, renderLeafSkill, leafIds, markers, seatMeta, PACK_IDS, ROUTE_IDS, APP_TITLE } = require("./seat-packs");
 const { cursorConfigDir, assertCursorUserDir } = require("./cursor-home");
 const { mimoConfigDir, assertMimoUserDir } = require("./mimo-home");
+const { kimiCodeHome, assertKimiUserDir } = require("./kimi-home");
 
 function homeOf(envKeys, folder) {
   for (const key of envKeys) {
@@ -125,6 +126,7 @@ function seatHomes() {
     workbuddy: realpathOrSelf(homeOf(["WORKBUDDY_HOME"], ".workbuddy")),
     cursor: cursorConfigDir(),
     mimo: mimoConfigDir(),
+    kimi: kimiCodeHome(),
   };
 }
 
@@ -290,6 +292,19 @@ function plan(seatId, overrideHome) {
       home: mimoRoot,
       writes: [
         { kind: "file", file: path.join(mimoRoot, "skills", "cha-mimo", "SKILL.md"), mode: "replace" },
+      ],
+      begin,
+      end,
+      pack,
+      meta,
+    };
+  }
+  if (seatId === "kimi") {
+    const kimiRoot = assertKimiUserDir(home);
+    return {
+      home: kimiRoot,
+      writes: [
+        { kind: "file", file: path.join(kimiRoot, "skills", "cha-kimi", "SKILL.md"), mode: "replace" },
       ],
       begin,
       end,

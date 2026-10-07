@@ -18,6 +18,7 @@ const CARDS = {
   workbuddy: { name: 'WorkBuddy', line: '搭档' },
   cursor: { name: 'Cursor', line: '.cursor' },
   mimo: { name: 'MiMo-V2.6-Pro', line: '.config' },
+  kimi: { name: 'Kimi K3', line: '.kimi-code' },
 };
 
 const LAUNCH = {
@@ -31,6 +32,7 @@ const LAUNCH = {
   workbuddy: [/workbuddy/i],
   cursor: [/cursor/i],
   mimo: [/mimo/i],
+  kimi: [/kimi/i],
 };
 
 const SKIP_LINK = /破甲|冷咖啡|coldcoffee|coldbrew/i;

@@ -4,7 +4,7 @@
   else root.ColdCoffeeCore = api;
 })(typeof globalThis === 'object' ? globalThis : this, function () {
   'use strict';
-  const VERSION = '3.1.0-preview.2';
+  const VERSION = '3.1.0-preview.3';
   const SEATS = [
     {id:'codex',tag:'GPT-6 Astra全模型支持',mark:'01',hint:'目标清单 → 最小实现 → 验收证据'},
     {id:'claude',tag:'Claude Code全模型支持',mark:'02',hint:'约束整理 → 结构化实现 → 差异复核'},
@@ -15,7 +15,8 @@
     {id:'doubao',tag:'豆包',mark:'07',hint:'技能落在平台用户数据目录的 .user_skills/cha-doubao，不写入自带 .skills',place:'DOUBAO_USER_SKILLS 或平台默认目录'},
     {id:'workbuddy',tag:'WorkBuddy',mark:'08',hint:'技能落在用户目录的 .workbuddy/skills/cha-workbuddy，入口写 AGENTS.md',place:'WORKBUDDY_HOME 或 ~/.workbuddy'},
     {id:'cursor',tag:'Cursor',mark:'09',hint:'常驻规则写在用户目录 .cursor/rules/cha-cursor.mdc，YAML 头 alwaysApply',place:'~/.cursor  · 不写安装目录，不写 AppData'},
-    {id:'mimo',tag:'MiMo-V2.6-Pro',mark:'10',hint:'技能写在用户配置目录 .config/mimocode/skills/cha-mimo/SKILL.md，YAML 头 name 为 cha-mimo',place:'~/.config/mimocode  · 不写 npm，不写 auth.json'}
+    {id:'mimo',tag:'MiMo-V2.6-Pro',mark:'10',hint:'技能写在用户配置目录 .config/mimocode/skills/cha-mimo/SKILL.md，YAML 头 name 为 cha-mimo',place:'~/.config/mimocode  · 不写 npm，不写 auth.json'},
+    {id:'kimi',tag:'Kimi K3',mark:'11',hint:'技能写在 Kimi Code 数据根 .kimi-code/skills/cha-kimi/SKILL.md，YAML 头 name 为 cha-kimi',place:'~/.kimi-code  · 不写 config.toml，不写 ~/.agents'}
   ];
   const PROFILES = [
     {id:'max',label:'全开',code:'MAX',brief:'完整交付、验收与后续步骤'},
