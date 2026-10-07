@@ -1,9 +1,10 @@
 <div align="center">
   <img src="docs/assets/coldcoffee-cover-v5-c18118b1aed9.jpg" width="100%" alt="冷咖啡黑白漫画主视觉，夜班吧台和一杯冰美式" />
   <h1>冷咖啡 · 破甲工作台</h1>
+  <p><a href="https://github.com/3641397194-wq/gpt6-Astra/blob/main/%E5%86%B7%E5%92%96%E5%95%A1.mp4"><strong>冷咖啡.mp4 · 点这里看视频</strong></a></p>
   <p><strong>九个软件 · 一键破甲 · 一键卸载 · Windows / macOS / Linux</strong></p>
   <p>打勾，按一下。打开软件后发「冷咖啡」。不想要了，按卸载，文件回到写入之前。</p>
-  <p><a href="#软件界面">软件界面</a> · <a href="#下载">下载</a> · <a href="docs/assets/冷咖啡.mp4">看视频</a> · <a href="#上手使用">上手使用</a> · <a href="#九个软件">九个软件</a> · <a href="#冷咖啡中转">冷咖啡中转</a> · <a href="#工具箱">工具箱</a> · <a href="#冷咖啡社群">三个 QQ 群</a></p>
+  <p><a href="#软件界面">软件界面</a> · <a href="#下载">下载</a> · <a href="#上手使用">上手使用</a> · <a href="#九个软件">九个软件</a> · <a href="#冷咖啡中转">冷咖啡中转</a> · <a href="#工具箱">工具箱</a> · <a href="#冷咖啡社群">三个 QQ 群</a></p>
   <p><sub>3.1.0-preview.1 · <a href="https://coldcoffeeai.com/">coldcoffeeai.com</a></sub></p>
 </div>
 
