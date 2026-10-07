@@ -278,7 +278,7 @@ function renderRelayCatalog(catalog,source='product') {
     const ver=document.createElement('span');ver.textContent=verified?(workflow.version||'服务器目录'):'中转内置';top.append(mark,ver);
     const title=document.createElement('h3');title.textContent=workflow.name||'冷咖啡工作流';
     const desc=document.createElement('p');desc.textContent=workflow.description||'按中转服务方案提供。';
-    const action=button(workflow.visibility==='private'?'进群私聊管理员':'查看接入配置',()=>{page(workflow.visibility==='private'?'community':'relay');});
+    const action=button(workflow.visibility==='private'?'闭源或定制，进群找管理':'查看接入配置',()=>{page(workflow.visibility==='private'?'community':'relay');});
     card.append(top,title,desc,action);return card;
   }));
 }
@@ -321,6 +321,7 @@ function renderRelay() {
   $('relay-refresh').addEventListener('click',()=>refreshRelayStatus({probe:true}));
   if($('relay-submit-task'))$('relay-submit-task').addEventListener('click',submitToRelay);
   if($('relay-teaser-open'))$('relay-teaser-open').addEventListener('click',()=>page('relay'));
+  for (const id of ['closed-pitch-go','newbie-closed','side-closed']) if($(id))$(id).addEventListener('click',()=>page('community'));
   updateRelaySelection();
 }
 function renderCommunity() {$('community').replaceChildren(...core.COMMUNITY.map((group,index)=>{const card=document.createElement('article');card.className='community-card';const label=document.createElement('div');label.className='eyebrow';label.textContent=`冷咖啡 / 0${index+1}`;const title=document.createElement('h2');title.textContent=group.name;const qr=button('',()=>{$('qr-large').src=img.src;$('qr-caption').textContent=`${group.name} · ${group.value}`;$('qr-dialog').showModal();},'qr-button');qr.setAttribute('aria-label',`放大${group.name}二维码`);const img=document.createElement('img');img.src=`../../assets/community/${group.image}`;img.alt=`${group.name}二维码，群号 ${group.value}`;qr.append(img);const row=document.createElement('div');row.className='group-number';const value=document.createElement('code');value.textContent=group.value;row.append(value,button('复制群号',()=>copy(group.value)));card.append(label,title,qr,row);return card;}));}
