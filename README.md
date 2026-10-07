@@ -3,7 +3,7 @@
   <h1>冷咖啡 · 破甲工作台</h1>
   <p><strong>九个软件 · 一键破甲 · 一键卸载 · Windows / macOS / Linux</strong></p>
   <p>打勾，按一下。打开软件后发「冷咖啡」。不想要了，按卸载，文件回到写入之前。</p>
-  <p><a href="#软件界面">软件界面</a> · <a href="#下载">下载</a> · <a href="#上手使用">上手使用</a> · <a href="#九个软件">九个软件</a> · <a href="#冷咖啡中转">冷咖啡中转</a> · <a href="#工具箱">工具箱</a> · <a href="#冷咖啡社群">三个 QQ 群</a></p>
+  <p><a href="#软件界面">软件界面</a> · <a href="#下载">下载</a> · <a href="docs/assets/冷咖啡.mp4">看视频</a> · <a href="#上手使用">上手使用</a> · <a href="#九个软件">九个软件</a> · <a href="#冷咖啡中转">冷咖啡中转</a> · <a href="#工具箱">工具箱</a> · <a href="#冷咖啡社群">三个 QQ 群</a></p>
   <p><sub>3.1.0-preview.1 · <a href="https://coldcoffeeai.com/">coldcoffeeai.com</a></sub></p>
 </div>
 
